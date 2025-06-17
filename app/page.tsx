@@ -574,7 +574,7 @@ function MultiviewerApp() {
               onClick={() => addWidget("map")}
               disabled={widgets.length >= 10}
               variant="outline"
-              className={theme === "dark" ? "text-white border-gray-600 hover:bg-gray-700" : ""}
+              className={theme === "dark" ? "text-white border-gray-600 bg-gray-800 hover:bg-gray-700" : ""}
             >
               <Map className="h-4 w-4 mr-2" />
               Add Map
@@ -602,12 +602,6 @@ function MultiviewerApp() {
                 ` ${widgets.filter((w) => w.type === "notes").length} Notes •`}
               {widgets.filter((w) => w.type === "rss").length > 0 &&
                 ` ${widgets.filter((w) => w.type === "rss").length} RSS`}
-            </div>
-
-            <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-              💡 For streams: Use direct .m3u8 (HLS) or .mpd (DASH) URLs. CORS-enabled streams work best.
-              <br />
-              📰 For RSS: Try feeds like https://feeds.bbci.co.uk/news/rss.xml or https://rss.cnn.com/rss/edition.rss
             </div>
 
             <div className="flex gap-2">
