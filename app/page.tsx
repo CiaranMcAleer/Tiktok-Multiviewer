@@ -21,6 +21,8 @@ import {
   GripVertical,
   Play,
   Rss,
+  CloudSun,
+  Tv,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -34,6 +36,9 @@ import WorldTimeWidget from "./components/world-time-widget"
 import WebsiteWidget from "./components/website-widget"
 import NotesWidget from "./components/notes-widget"
 import RSSWidget from "./components/rss-widget"
+import WeatherWidget from "./components/weather-widget"
+import WeatherLocationSelector from "./components/weather-location-selector"
+import TwitchWidget from "./components/twitch-widget"
 import { ThemeProvider, useTheme } from "./components/theme-provider"
 import type { Widget, LayoutData, WidgetType } from "./types/widget"
 import PopupManager from "./utils/popup-manager"
@@ -49,6 +54,8 @@ function MultiviewerApp() {
   const [isWebsiteDialogOpen, setIsWebsiteDialogOpen] = useState(false)
   const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false)
   const [isRSSDialogOpen, setIsRSSDialogOpen] = useState(false)
+  const [isWeatherDialogOpen, setIsWeatherDialogOpen] = useState(false)
+  const [isTwitchDialogOpen, setIsTwitchDialogOpen] = useState(false)
   const [loadCode, setLoadCode] = useState("")
   const [websiteUrl, setWebsiteUrl] = useState("")
   const [websiteTitle, setWebsiteTitle] = useState("")
@@ -56,6 +63,11 @@ function MultiviewerApp() {
   const [rssUrl, setRssUrl] = useState("")
   const [rssTitle, setRssTitle] = useState("")
   const [rssRefreshInterval, setRssRefreshInterval] = useState(5) // in minutes
+  const [weatherLocation, setWeatherLocation] = useState("")
+  const [weatherLatitude, setWeatherLatitude] = useState<number | null>(null)
+  const [weatherLongitude, setWeatherLongitude] = useState<number | null>(null)
+  const [twitchChannel, setTwitchChannel] = useState("")
+  const [twitchTitle, setTwitchTitle] = useState("")
   const [currentHintIndex, setCurrentHintIndex] = useState(0)
   const [gridColumns, setGridColumns] = useState(2)
   const [gridRows, setGridRows] = useState(2)
@@ -72,6 +84,10 @@ function MultiviewerApp() {
     "For RSS: Try feeds like https://feeds.bbci.co.uk/news/rss.xml",
     "Popular RSS feeds: https://rss.cnn.com/rss/edition.rss works great",
     "RSS feeds auto-refresh (adjustable from 5 seconds to 60 minutes)",
+    "Weather widgets show current conditions and 3-day forecasts",
+    "Weather data updates every 10 minutes automatically",
+    "Twitch widgets embed live streams - channel must be live to see content",
+    "Twitch streams support playback controls and direct links to Twitch",
     "Traffic cameras update every 20 seconds",
     "Use the + button for quick widgets like maps and notes",
     "Share your layout with the export button",
@@ -176,6 +192,14 @@ function MultiviewerApp() {
       type = "rss"
       url = ""
       title = title || "RSS Feed"
+    } else if (forceType === "weather") {
+      type = "weather"
+      url = ""
+      title = title || "Weather"
+    } else if (forceType === "twitch") {
+      type = "twitch"
+      url = ""
+      title = title || "Twitch Stream"
     } else if (url) {
       // Auto-detect content type based on URL
       if (url.includes("tiktok.com") || url.includes("@") || extractTikTokUsername(url)) {
@@ -323,12 +347,31 @@ function MultiviewerApp() {
     setIsRSSDialogOpen(false)
   }
 
-  const removeWidget = (id: string) => {
-    // Close any open popup for this widget
-    popupManager.current.closePopup(id)
-
-    // Remove the widget from the list
-    setWidgets(widgets.filter((w) => w.id !== id))
+  const addWeatherWidget = () => {
+    if (widgets.length >= 10) {
+      alert("Maximum 10 widgets allowed")
+      return
+    }
+    
+    if (!weatherLocation || weatherLatitude === null || weatherLongitude === null) {
+      alert("Please select a location")
+      return
+    }
+    
+    const newWidget: Widget = {
+      id: Date.now().toString(),
+      type: "weather",
+      url: "",
+      title: weatherLocation, // Use location as title
+      location: weatherLocation,
+      latitude: weatherLatitude,
+      longitude: weatherLongitude,
+    }
+    setWidgets([...widgets, newWidget])
+    setWeatherLocation("")
+    setWeatherLatitude(null)
+    setWeatherLongitude(null)
+    setIsWeatherDialogOpen(false)
   }
 
   const updateWorldTimeWidget = (id: string, city: string, timezone: string) => {
@@ -337,6 +380,57 @@ function MultiviewerApp() {
 
   const updateNotesWidget = (id: string, content: string) => {
     setWidgets(widgets.map((w) => (w.id === id ? { ...w, content } : w)))
+  }
+
+  const updateWeatherWidget = (id: string, location: string, latitude: number, longitude: number) => {
+    setWidgets(widgets.map(w => 
+      w.id === id 
+        ? { ...w, location, latitude, longitude }
+        : w
+    ))
+  }
+
+  const removeWidget = (id: string) => {
+    setWidgets(widgets.filter(w => w.id !== id))
+  }
+
+  const addTwitchWidget = () => {
+    if (widgets.length >= 10) {
+      alert("Maximum 10 widgets allowed")
+      return
+    }
+
+    if (!twitchChannel.trim()) {
+      alert("Please enter a Twitch channel name")
+      return
+    }
+
+    const cleanChannel = twitchChannel.trim().replace(/^@?/, "") // Remove @ if present
+    if (!/^[a-zA-Z0-9_]{4,25}$/.test(cleanChannel)) {
+      alert("Invalid channel name. Use 4-25 characters (letters, numbers, underscore)")
+      return
+    }
+
+    const newWidget: Widget = {
+      id: Date.now().toString(),
+      type: "twitch",
+      url: `https://twitch.tv/${cleanChannel}`,
+      title: twitchTitle.trim() || `twitch.tv/${cleanChannel}`,
+      twitchChannel: cleanChannel,
+    }
+
+    setWidgets([...widgets, newWidget])
+    setTwitchChannel("")
+    setTwitchTitle("")
+    setIsTwitchDialogOpen(false)
+  }
+
+  const updateTwitchWidget = (id: string, channel: string) => {
+    setWidgets(widgets.map(w => 
+      w.id === id 
+        ? { ...w, twitchChannel: channel, url: `https://twitch.tv/${channel}` }
+        : w
+    ))
   }
 
   // Drag and drop handlers
@@ -539,6 +633,14 @@ function MultiviewerApp() {
                     <Rss className="h-4 w-4 mr-2" />
                     RSS Feed
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIsWeatherDialogOpen(true)}>
+                    <CloudSun className="h-4 w-4 mr-2" />
+                    Weather
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIsTwitchDialogOpen(true)}>
+                    <Tv className="h-4 w-4 mr-2" />
+                    Twitch Stream
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full">
@@ -601,7 +703,11 @@ function MultiviewerApp() {
               {widgets.filter((w) => w.type === "notes").length > 0 &&
                 ` ${widgets.filter((w) => w.type === "notes").length} Notes •`}
               {widgets.filter((w) => w.type === "rss").length > 0 &&
-                ` ${widgets.filter((w) => w.type === "rss").length} RSS`}
+                ` ${widgets.filter((w) => w.type === "rss").length} RSS •`}
+              {widgets.filter((w) => w.type === "weather").length > 0 &&
+                ` ${widgets.filter((w) => w.type === "weather").length} Weather •`}
+              {widgets.filter((w) => w.type === "twitch").length > 0 &&
+                ` ${widgets.filter((w) => w.type === "twitch").length} Twitch`}
             </div>
 
             <div className="flex gap-2">
@@ -834,6 +940,67 @@ function MultiviewerApp() {
                 </DialogContent>
               </Dialog>
 
+              <Dialog open={isWeatherDialogOpen} onOpenChange={setIsWeatherDialogOpen}>
+                <DialogContent className="z-[9999]">
+                  <DialogHeader>
+                    <DialogTitle>Add Weather Widget</DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-4 space-y-4">
+                    <WeatherLocationSelector
+                      onLocationSelect={(location, latitude, longitude) => {
+                        setWeatherLocation(location)
+                        setWeatherLatitude(latitude)
+                        setWeatherLongitude(longitude)
+                      }}
+                    />
+                    <Button 
+                      onClick={addWeatherWidget} 
+                      className="w-full"
+                      disabled={!weatherLocation}
+                    >
+                      Add Weather Widget
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={isTwitchDialogOpen} onOpenChange={setIsTwitchDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button style={{ display: "none" }}>Twitch Dialog</Button>
+                </DialogTrigger>
+                <DialogContent className="z-[9999]">
+                  <DialogHeader>
+                    <DialogTitle>Add Twitch Stream Widget</DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-4 space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Twitch Channel</label>
+                      <Input
+                        value={twitchChannel}
+                        onChange={(e) => setTwitchChannel(e.target.value)}
+                        placeholder="ninja, pokimane, shroud..."
+                        onKeyPress={(e) => e.key === "Enter" && addTwitchWidget()}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Widget Title (optional)</label>
+                      <Input
+                        value={twitchTitle}
+                        onChange={(e) => setTwitchTitle(e.target.value)}
+                        placeholder="Twitch Stream"
+                        onKeyPress={(e) => e.key === "Enter" && addTwitchWidget()}
+                      />
+                    </div>
+                    <div className="text-sm text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 p-3 rounded-md">
+                      <strong>Info:</strong> Embeds live Twitch streams. Channel must be live for the stream to appear. You can control playback and open the stream in Twitch directly.
+                    </div>
+                    <Button onClick={addTwitchWidget} className="w-full">
+                      Add Twitch Widget
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
               <Button variant="ghost" size="sm" onClick={clearAllWidgets} disabled={widgets.length === 0}>
                 <Trash2 className="h-4 w-4 mr-1" />
                 Clear All
@@ -926,6 +1093,25 @@ function MultiviewerApp() {
                   <RSSWidget
                     widget={widget}
                     onRemove={() => removeWidget(widget.id)}
+                    theme={theme}
+                  />
+                ) : widget.type === "weather" ? (
+                  <WeatherWidget
+                    widget={widget}
+                    onRemove={() => removeWidget(widget.id)}
+                    onLocationChange={(location, latitude, longitude) => {
+                      // Update widget location/coords
+                      setWidgets((prev) => prev.map((w) =>
+                        w.id === widget.id ? { ...w, location, latitude, longitude } : w
+                      ))
+                    }}
+                    theme={theme}
+                  />
+                ) : widget.type === "twitch" ? (
+                  <TwitchWidget
+                    widget={widget}
+                    onRemove={() => removeWidget(widget.id)}
+                    onChannelChange={(channel) => updateTwitchWidget(widget.id, channel)}
                     theme={theme}
                   />
                 ) : (

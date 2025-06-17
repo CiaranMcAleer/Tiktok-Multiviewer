@@ -10,6 +10,26 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+  
+  /* Z-index utilities to prevent layering issues */
+  .z-modal {
+    z-index: 50;
+  }
+  .z-dropdown {
+    z-index: 60;
+  }
+  .z-tooltip {
+    z-index: 70;
+  }
+  .z-overlay {
+    z-index: 80;
+  }
+  .z-max {
+    z-index: 9999;
+  }
+  .z-super-high {
+    z-index: 10000;
+  }
 }
 
 @layer base {

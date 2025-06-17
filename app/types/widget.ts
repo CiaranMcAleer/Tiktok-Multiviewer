@@ -1,4 +1,4 @@
-export type WidgetType = "tiktok" | "youtube" | "trafficcam" | "map" | "worldtime" | "website" | "notes" | "stream" | "rss"
+export type WidgetType = "tiktok" | "youtube" | "trafficcam" | "map" | "worldtime" | "website" | "notes" | "stream" | "rss" | "weather" | "twitch"
 
 export interface Widget {
   id: string
@@ -12,6 +12,10 @@ export interface Widget {
   streamType?: "hls" | "dash" | "mp4" // For stream widgets
   feedUrl?: string // For RSS widgets
   maxItems?: number // For RSS widgets - max items to display
+  latitude?: number // For weather widgets
+  longitude?: number // For weather widgets
+  location?: string // For weather widgets - display name
+  twitchChannel?: string // For twitch widgets
 }
 
 export interface LayoutData {
