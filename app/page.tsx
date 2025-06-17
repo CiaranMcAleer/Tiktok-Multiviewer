@@ -19,6 +19,7 @@ import {
   Globe,
   FileText,
   GripVertical,
+  Play,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -26,6 +27,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import StreamWidget from "./components/stream-widget"
+import VideoStreamWidget from "./components/video-stream-widget"
 import MapWidget from "./components/map-widget"
 import WorldTimeWidget from "./components/world-time-widget"
 import WebsiteWidget from "./components/website-widget"
@@ -127,6 +129,7 @@ function MultiviewerApp() {
     let url = inputUrl.trim()
     let title = inputTitle.trim()
     let type: WidgetType = forceType || "trafficcam" // Default to traffic cam if no URL and no forced type
+    let streamType: "hls" | "dash" | "mp4" | undefined = undefined
 
     // If forced type is map, create map regardless of URL
     if (forceType === "map") {
@@ -162,6 +165,19 @@ function MultiviewerApp() {
           url = `https://www.youtube.com/watch?v=${url}`
         }
         title = title || "YouTube Video"
+      } else if (url.includes(".m3u8") || url.includes(".mpd") || url.includes("hls") || url.includes("dash") || url.includes("stream")) {
+        type = "stream"
+        // Detect stream type based on URL
+        if (url.includes(".m3u8") || url.includes("hls")) {
+          streamType = "hls"
+        } else if (url.includes(".mpd") || url.includes("dash")) {
+          streamType = "dash"
+        } else if (url.includes(".mp4")) {
+          streamType = "mp4"
+        } else {
+          streamType = "hls" // default
+        }
+        title = title || `${streamType.toUpperCase()} Stream`
       } else if (url.includes("trafficwatchni.com") || url.includes("traffic")) {
         type = "trafficcam"
         title = title || "Traffic Camera"
@@ -184,6 +200,7 @@ function MultiviewerApp() {
       city: type === "worldtime" ? "Belfast" : undefined,
       timezone: type === "worldtime" ? "Europe/London" : undefined,
       content: type === "notes" ? "" : undefined,
+      streamType: type === "stream" ? streamType : undefined,
     }
 
     setWidgets([...widgets, newWidget])
@@ -462,7 +479,7 @@ function MultiviewerApp() {
           {/* Controls */}
           <div className="flex gap-2 mb-2">
             <Input
-              placeholder="Enter URL (supports TikTok streams, YouTube videos, TrafficWatch cameras)"
+              placeholder="Enter URL (TikTok, YouTube, HLS (.m3u8), DASH (.mpd), MP4 streams, traffic cameras)"
               value={inputUrl}
               onChange={(e) => setInputUrl(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && addWidget()}
@@ -500,6 +517,8 @@ function MultiviewerApp() {
                 ` ${widgets.filter((w) => w.type === "tiktok").length} TikTok •`}
               {widgets.filter((w) => w.type === "youtube").length > 0 &&
                 ` ${widgets.filter((w) => w.type === "youtube").length} YouTube •`}
+              {widgets.filter((w) => w.type === "stream").length > 0 &&
+                ` ${widgets.filter((w) => w.type === "stream").length} Streams •`}
               {widgets.filter((w) => w.type === "trafficcam").length > 0 &&
                 ` ${widgets.filter((w) => w.type === "trafficcam").length} Cameras •`}
               {widgets.filter((w) => w.type === "map").length > 0 &&
@@ -510,6 +529,10 @@ function MultiviewerApp() {
                 ` ${widgets.filter((w) => w.type === "website").length} Websites •`}
               {widgets.filter((w) => w.type === "notes").length > 0 &&
                 ` ${widgets.filter((w) => w.type === "notes").length} Notes`}
+            </div>
+
+            <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+              💡 For streams: Use direct .m3u8 (HLS) or .mpd (DASH) URLs. CORS-enabled streams work best.
             </div>
 
             <div className="flex gap-2">
@@ -704,11 +727,12 @@ function MultiviewerApp() {
               <div className="flex justify-center gap-8 mb-6">
                 <Plus className="h-16 w-16 opacity-50" />
                 <Youtube className="h-16 w-16 opacity-50" />
+                <Play className="h-16 w-16 opacity-50" />
                 <Camera className="h-16 w-16 opacity-50" />
                 <Map className="h-16 w-16 opacity-50" />
               </div>
               <p className="text-lg">No content added yet</p>
-              <p className="text-sm">Add TikTok, YouTube, traffic cameras, maps, or other widgets to get started</p>
+              <p className="text-sm">Add TikTok, YouTube, HLS/DASH streams, traffic cameras, maps, or other widgets to get started</p>
             </div>
           </div>
         ) : (
@@ -757,6 +781,12 @@ function MultiviewerApp() {
                     content={widget.content || ""}
                     onRemove={() => removeWidget(widget.id)}
                     onContentChange={(content) => updateNotesWidget(widget.id, content)}
+                    theme={theme}
+                  />
+                ) : widget.type === "stream" ? (
+                  <VideoStreamWidget
+                    widget={widget}
+                    onRemove={() => removeWidget(widget.id)}
                     theme={theme}
                   />
                 ) : (
