@@ -20,6 +20,7 @@ import {
   FileText,
   GripVertical,
   Play,
+  Rss,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,6 +33,7 @@ import MapWidget from "./components/map-widget"
 import WorldTimeWidget from "./components/world-time-widget"
 import WebsiteWidget from "./components/website-widget"
 import NotesWidget from "./components/notes-widget"
+import RSSWidget from "./components/rss-widget"
 import { ThemeProvider, useTheme } from "./components/theme-provider"
 import type { Widget, LayoutData, WidgetType } from "./types/widget"
 import PopupManager from "./utils/popup-manager"
@@ -46,16 +48,42 @@ function MultiviewerApp() {
   const [isGridDialogOpen, setIsGridDialogOpen] = useState(false)
   const [isWebsiteDialogOpen, setIsWebsiteDialogOpen] = useState(false)
   const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false)
+  const [isRSSDialogOpen, setIsRSSDialogOpen] = useState(false)
   const [loadCode, setLoadCode] = useState("")
   const [websiteUrl, setWebsiteUrl] = useState("")
   const [websiteTitle, setWebsiteTitle] = useState("")
   const [notesTitle, setNotesTitle] = useState("")
+  const [rssUrl, setRssUrl] = useState("")
+  const [rssTitle, setRssTitle] = useState("")
+  const [rssRefreshInterval, setRssRefreshInterval] = useState(5) // in minutes
+  const [currentHintIndex, setCurrentHintIndex] = useState(0)
   const [gridColumns, setGridColumns] = useState(2)
   const [gridRows, setGridRows] = useState(2)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const { theme, toggleTheme } = useTheme()
   const popupManager = useRef<PopupManager>(PopupManager.getInstance())
+
+  // Hints system - cycles through different helpful tips
+  const hints = [
+    "Try @username for TikTok live streams",
+    "Paste YouTube video URLs or video IDs",
+    "For streams: Use direct .m3u8 (HLS) or .mpd (DASH) URLs. CORS-enabled streams work best.",
+    "For RSS: Try feeds like https://feeds.bbci.co.uk/news/rss.xml",
+    "Popular RSS feeds: https://rss.cnn.com/rss/edition.rss works great",
+    "RSS feeds auto-refresh (adjustable from 5 seconds to 60 minutes)",
+    "Traffic cameras update every 20 seconds",
+    "Use the + button for quick widgets like maps and notes",
+    "Share your layout with the export button",
+  ]
+
+  // Cycle through hints every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHintIndex((prev) => (prev + 1) % hints.length)
+    }, 4000)
+    return () => clearInterval(interval)
+  }, [])
 
   // Load layout from URL parameter on initial load
   useEffect(() => {
@@ -144,6 +172,10 @@ function MultiviewerApp() {
       type = "notes"
       url = ""
       title = title || "Notes"
+    } else if (forceType === "rss") {
+      type = "rss"
+      url = ""
+      title = title || "RSS Feed"
     } else if (url) {
       // Auto-detect content type based on URL
       if (url.includes("tiktok.com") || url.includes("@") || extractTikTokUsername(url)) {
@@ -178,6 +210,9 @@ function MultiviewerApp() {
           streamType = "hls" // default
         }
         title = title || `${streamType.toUpperCase()} Stream`
+      } else if (url.includes(".xml") || url.includes(".rss") || url.includes("rss") || url.includes("feed") || url.includes("atom")) {
+        type = "rss"
+        title = title || "RSS Feed"
       } else if (url.includes("trafficwatchni.com") || url.includes("traffic")) {
         type = "trafficcam"
         title = title || "Traffic Camera"
@@ -196,11 +231,13 @@ function MultiviewerApp() {
       type,
       url,
       title,
-      refreshInterval: type === "trafficcam" ? 20000 : undefined, // Changed to 20 seconds
+      refreshInterval: type === "trafficcam" ? 20000 : type === "rss" ? 5 * 60 * 1000 : undefined, // 20 seconds for traffic cam, 5 minutes for RSS
       city: type === "worldtime" ? "Belfast" : undefined,
       timezone: type === "worldtime" ? "Europe/London" : undefined,
       content: type === "notes" ? "" : undefined,
       streamType: type === "stream" ? streamType : undefined,
+      feedUrl: type === "rss" ? url : undefined,
+      maxItems: type === "rss" ? 10 : undefined,
     }
 
     setWidgets([...widgets, newWidget])
@@ -254,6 +291,36 @@ function MultiviewerApp() {
     setWidgets([...widgets, newWidget])
     setNotesTitle("")
     setIsNotesDialogOpen(false)
+  }
+
+  const addRSSWidget = () => {
+    if (widgets.length >= 10) {
+      alert("Maximum 10 widgets allowed")
+      return
+    }
+
+    if (!rssUrl.trim()) {
+      alert("Please enter an RSS feed URL")
+      return
+    }
+
+    const refreshIntervalMs = rssRefreshInterval === 0 ? 5000 : rssRefreshInterval * 60 * 1000 // 0 = realtime (5 sec), otherwise minutes
+
+    const newWidget: Widget = {
+      id: Date.now().toString(),
+      type: "rss",
+      url: rssUrl.trim(),
+      title: rssTitle.trim() || "RSS Feed",
+      feedUrl: rssUrl.trim(),
+      refreshInterval: refreshIntervalMs,
+      maxItems: 10,
+    }
+
+    setWidgets([...widgets, newWidget])
+    setRssUrl("")
+    setRssTitle("")
+    setRssRefreshInterval(5) // Reset to default
+    setIsRSSDialogOpen(false)
   }
 
   const removeWidget = (id: string) => {
@@ -468,6 +535,10 @@ function MultiviewerApp() {
                     <FileText className="h-4 w-4 mr-2" />
                     Notes
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIsRSSDialogOpen(true)}>
+                    <Rss className="h-4 w-4 mr-2" />
+                    RSS Feed
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full">
@@ -479,7 +550,7 @@ function MultiviewerApp() {
           {/* Controls */}
           <div className="flex gap-2 mb-2">
             <Input
-              placeholder="Enter URL (TikTok, YouTube, HLS (.m3u8), DASH (.mpd), MP4 streams, traffic cameras)"
+              placeholder="Enter any URL or use + for widgets"
               value={inputUrl}
               onChange={(e) => setInputUrl(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && addWidget()}
@@ -528,11 +599,15 @@ function MultiviewerApp() {
               {widgets.filter((w) => w.type === "website").length > 0 &&
                 ` ${widgets.filter((w) => w.type === "website").length} Websites •`}
               {widgets.filter((w) => w.type === "notes").length > 0 &&
-                ` ${widgets.filter((w) => w.type === "notes").length} Notes`}
+                ` ${widgets.filter((w) => w.type === "notes").length} Notes •`}
+              {widgets.filter((w) => w.type === "rss").length > 0 &&
+                ` ${widgets.filter((w) => w.type === "rss").length} RSS`}
             </div>
 
             <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
               💡 For streams: Use direct .m3u8 (HLS) or .mpd (DASH) URLs. CORS-enabled streams work best.
+              <br />
+              📰 For RSS: Try feeds like https://feeds.bbci.co.uk/news/rss.xml or https://rss.cnn.com/rss/edition.rss
             </div>
 
             <div className="flex gap-2">
@@ -563,7 +638,7 @@ function MultiviewerApp() {
                           <SelectTrigger>
                             <SelectValue placeholder="Select columns" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="z-[10000]">
                             <SelectItem value="1">1 Column</SelectItem>
                             <SelectItem value="2">2 Columns</SelectItem>
                             <SelectItem value="3">3 Columns</SelectItem>
@@ -580,7 +655,7 @@ function MultiviewerApp() {
                           <SelectTrigger>
                             <SelectValue placeholder="Select rows" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="z-[10000]">
                             <SelectItem value="1">1 Row</SelectItem>
                             <SelectItem value="2">2 Rows</SelectItem>
                             <SelectItem value="3">3 Rows</SelectItem>
@@ -710,10 +785,74 @@ function MultiviewerApp() {
                 </DialogContent>
               </Dialog>
 
+              <Dialog open={isRSSDialogOpen} onOpenChange={setIsRSSDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button style={{ display: "none" }}>RSS Dialog</Button>
+                </DialogTrigger>
+                <DialogContent className="z-[9999]">
+                  <DialogHeader>
+                    <DialogTitle>Add RSS Feed Widget</DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-4 space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Feed URL</label>
+                      <Input
+                        value={rssUrl}
+                        onChange={(e) => setRssUrl(e.target.value)}
+                        placeholder="https://example.com/feed.xml"
+                        onKeyPress={(e) => e.key === "Enter" && addRSSWidget()}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Feed Title (optional)</label>
+                      <Input
+                        value={rssTitle}
+                        onChange={(e) => setRssTitle(e.target.value)}
+                        placeholder="My RSS Feed"
+                        onKeyPress={(e) => e.key === "Enter" && addRSSWidget()}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Refresh Interval</label>
+                      <Select value={rssRefreshInterval.toString()} onValueChange={(value) => setRssRefreshInterval(Number(value))}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="z-[10000]">
+                          <SelectItem value="0">Realtime (5 seconds)</SelectItem>
+                          <SelectItem value="1">1 minute</SelectItem>
+                          <SelectItem value="2">2 minutes</SelectItem>
+                          <SelectItem value="5">5 minutes</SelectItem>
+                          <SelectItem value="10">10 minutes</SelectItem>
+                          <SelectItem value="15">15 minutes</SelectItem>
+                          <SelectItem value="30">30 minutes</SelectItem>
+                          <SelectItem value="60">60 minutes</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="text-sm text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 p-3 rounded-md">
+                      <strong>Tip:</strong> Supports RSS, Atom, and XML feeds. Choose refresh rate based on feed update frequency.
+                    </div>
+                    <Button onClick={addRSSWidget} className="w-full">
+                      Add RSS Feed
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
               <Button variant="ghost" size="sm" onClick={clearAllWidgets} disabled={widgets.length === 0}>
                 <Trash2 className="h-4 w-4 mr-1" />
                 Clear All
               </Button>
+            </div>
+          </div>
+
+          {/* Cycling Hint */}
+          <div className={`text-center py-2 transition-opacity duration-500 ${
+            theme === "dark" ? "text-gray-400" : "text-gray-600"
+          }`}>
+            <div className="text-sm">
+              💡 <span className="italic">{hints[currentHintIndex]}</span>
             </div>
           </div>
         </div>
@@ -785,6 +924,12 @@ function MultiviewerApp() {
                   />
                 ) : widget.type === "stream" ? (
                   <VideoStreamWidget
+                    widget={widget}
+                    onRemove={() => removeWidget(widget.id)}
+                    theme={theme}
+                  />
+                ) : widget.type === "rss" ? (
+                  <RSSWidget
                     widget={widget}
                     onRemove={() => removeWidget(widget.id)}
                     theme={theme}
