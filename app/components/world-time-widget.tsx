@@ -120,33 +120,35 @@ export default function WorldTimeWidget({
   useEffect(() => {
     const fetchTimezones = async () => {
       try {
-        // Try HTTPS first
-        const response = await fetch("https://worldtimeapi.org/api/timezone")
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
-        }
-        const timezones = await response.json()
-        if (Array.isArray(timezones) && timezones.length > 0) {
-          setAvailableTimezones(timezones)
-          return
-        }
-      } catch (error) {
-        console.warn("Failed to fetch from HTTPS API, trying HTTP:", error)
+        // Use CORS proxy for timezone list
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent('https://worldtimeapi.org/api/timezone')}`
+        
+        // Create timeout controller for older browsers
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+        
+        const response = await fetch(proxyUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+          signal: controller.signal
+        })
 
-        // Fallback to HTTP
-        try {
-          const response = await fetch("http://worldtimeapi.org/api/timezone")
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`)
-          }
-          const timezones = await response.json()
+        clearTimeout(timeoutId)
+
+        if (response.ok) {
+          const proxyData = await response.json()
+          const timezones = JSON.parse(proxyData.contents)
+          
           if (Array.isArray(timezones) && timezones.length > 0) {
             setAvailableTimezones(timezones)
+            console.log("Loaded timezones from API")
             return
           }
-        } catch (httpError) {
-          console.warn("Failed to fetch from HTTP API:", httpError)
         }
+      } catch (error) {
+        console.warn("Failed to fetch timezones from API:", error)
       }
 
       // Use fallback timezones if API fails
@@ -161,6 +163,13 @@ export default function WorldTimeWidget({
   const fetchTimeData = async (isResync = false) => {
     if (!timezone) return
 
+    // Validate timezone before making API call
+    if (!isValidTimezone(timezone)) {
+      console.error(`Invalid timezone: ${timezone}`)
+      setError("Invalid timezone")
+      return
+    }
+
     // Don't fetch too frequently - only resync every 15 minutes
     const now = Date.now()
     if (isResync && now - lastSyncRef.current < 15 * 60 * 1000) {
@@ -169,20 +178,41 @@ export default function WorldTimeWidget({
 
     try {
       if (!isResync) setLoading(true)
-      let response
+      
+      // Use CORS proxy for WorldTimeAPI to avoid CORS issues
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://worldtimeapi.org/api/timezone/${timezone}`)}`
+      
+      // Create timeout controller for older browsers
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+      
+      const response = await fetch(proxyUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+        signal: controller.signal
+      })
 
-      // Try HTTPS first
-      try {
-        response = await fetch(`https://worldtimeapi.org/api/timezone/${timezone}`)
-      } catch (httpsError) {
-        // Fallback to HTTP if HTTPS fails
-        console.warn("HTTPS failed, trying HTTP:", httpsError)
-        response = await fetch(`http://worldtimeapi.org/api/timezone/${timezone}`)
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
       }
 
-      if (!response.ok) throw new Error(`Failed to fetch time data: ${response.status}`)
+      const proxyData = await response.json()
+      
+      if (!proxyData.contents) {
+        throw new Error('No data received from proxy')
+      }
 
-      const data: WorldTimeData = await response.json()
+      const data: WorldTimeData = JSON.parse(proxyData.contents)
+      
+      // Validate the data structure
+      if (!data.datetime || !data.timezone) {
+        throw new Error('Invalid time data structure')
+      }
+
       setTimeData(data)
       setError(null)
       setUseApiFallback(false)
@@ -190,25 +220,65 @@ export default function WorldTimeWidget({
 
       console.log(`Time synced for ${timezone}${isResync ? " (resync)" : ""}`)
     } catch (error) {
-      console.error("Failed to fetch time data:", error)
+      console.warn("API fetch failed, using browser fallback:", error)
 
       if (!isResync) {
         setError("Using browser timezone")
         setUseApiFallback(true)
 
-        // Create fallback data - we'll use browser's Intl API
-        const fallbackData: WorldTimeData = {
-          datetime: new Date().toISOString(),
-          timezone: timezone,
-          abbreviation: "LOCAL",
-          dst: false,
-          utc_offset: "+00:00",
-          unixtime: Math.floor(Date.now() / 1000),
+        // Create fallback data using browser's Intl API
+        try {
+          const now = new Date()
+          const formatter = new Intl.DateTimeFormat('en', {
+            timeZone: timezone,
+            timeZoneName: 'short'
+          })
+          
+          const parts = formatter.formatToParts(now)
+          const timeZoneName = parts.find(part => part.type === 'timeZoneName')?.value || 'LOCAL'
+          
+          const fallbackData: WorldTimeData = {
+            datetime: now.toISOString(),
+            timezone: timezone,
+            abbreviation: timeZoneName,
+            dst: false,
+            utc_offset: getTimezoneOffset(timezone),
+            unixtime: Math.floor(now.getTime() / 1000),
+          }
+          setTimeData(fallbackData)
+        } catch (fallbackError) {
+          console.error("Fallback also failed:", fallbackError)
+          setError("Timezone not supported")
         }
-        setTimeData(fallbackData)
       }
     } finally {
       if (!isResync) setLoading(false)
+    }
+  }
+
+  // Helper function to get timezone offset
+  const getTimezoneOffset = (tz: string): string => {
+    try {
+      const now = new Date()
+      const utc1 = new Date(now.getTime() + (now.getTimezoneOffset() * 60000))
+      const utc2 = new Date(utc1.toLocaleString("en-US", {timeZone: tz}))
+      const diff = (utc1.getTime() - utc2.getTime()) / (1000 * 60 * 60)
+      const hours = Math.floor(Math.abs(diff))
+      const minutes = Math.floor((Math.abs(diff) - hours) * 60)
+      const sign = diff <= 0 ? '+' : '-'
+      return `${sign}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+    } catch {
+      return '+00:00'
+    }
+  }
+
+  // Helper function to validate timezone strings
+  const isValidTimezone = (tz: string): boolean => {
+    try {
+      Intl.DateTimeFormat(undefined, { timeZone: tz })
+      return true
+    } catch {
+      return false
     }
   }
 
