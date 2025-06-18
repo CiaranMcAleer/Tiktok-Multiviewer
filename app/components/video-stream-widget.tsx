@@ -242,13 +242,13 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
             <span className="font-medium truncate">{widget.title}</span>
           </div>
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={refreshStream}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={refreshStream} aria-label="Refresh stream">
               <RefreshCw className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={openInNewTab}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={openInNewTab} aria-label="Open in new tab">
               <ExternalLink className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -308,13 +308,13 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
           )}
         </div>
         <div className="flex gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={refreshStream}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={refreshStream} aria-label="Refresh stream">
             <RefreshCw className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={openInNewTab}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={openInNewTab} aria-label="Open in new tab">
             <ExternalLink className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
             <X className="h-4 w-4" />
           </Button>
         </div>

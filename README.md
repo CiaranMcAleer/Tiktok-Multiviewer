@@ -39,10 +39,23 @@ Next.js-based multiviewer grid for TikTok Live. Also supports YouTube, TrafficWa
 - **Notes**
 
 ## ✨ How to Use
-1. **Add a Widget:** Paste a TikTok, YouTube, or camera link, or use the menu to add maps, clocks, websites, or notes.
-2. **Arrange:** Drag and drop widgets to organize your grid.
-3. **Share:** Click 'Share' to get a link to your current layout.
-4. **Restore:** Paste a shared layout link to restore a grid.
+
+### Adding Content
+- **Paste URLs:** TikTok, YouTube, or traffic camera links automatically create appropriate widgets
+- **Use Prefixes:** For clarity, use `tw:username`, `yt:channel`, or `@tiktokuser` 
+- **Add Utilities:** Use the menu to add maps, clocks, websites, or notes
+
+### Input Examples
+- `https://www.tiktok.com/@user` → TikTok widget
+- `tw:ninja` → Twitch channel widget  
+- `yt:mkbhd` → YouTube channel widget
+- `@charlidamelio` → TikTok widget
+- `ninja` → Shows disambiguation dialog
+
+### Layout Management
+1. **Arrange:** Drag and drop widgets to organize your grid
+2. **Share:** Click 'Share' to get a link to your current layout
+3. **Restore:** Paste a shared layout link to restore a grid
 
 ## 🛠️ Local Development
 ```bash
@@ -54,6 +67,14 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 ## ☁️ Deploy
 - **Vercel:** Click the Deploy button above or run `vercel` in your project directory.
 - **Netlify:** Configure as a Next.js app, or use your preferred static host.
+
+## 📚 Documentation
+
+- **[Documentation Index](docs/README.md)** - Complete documentation overview and navigation
+- **[Technical Documentation](docs/TECHNICAL.md)** - Architecture, components, and implementation details
+- **[Username Disambiguation](docs/USERNAME_DISAMBIGUATION.md)** - How the input system works
+- **[Testing Guide](docs/TESTING.md)** - Testing setup, running tests, and contributing
+- **[Changelog](docs/CHANGELOG.md)** - Version history and recent improvements
 
 ## 📄 License
 MIT — Ciaran McAleer

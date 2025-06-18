@@ -56,11 +56,11 @@ export default function NotesWidget({ title, content, onRemove, onContentChange,
         </div>
         <div className="flex gap-1">
           {hasUnsavedChanges && (
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={saveContent} title="Save (Ctrl+S)">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={saveContent} title="Save (Ctrl+S)" aria-label="Save notes">
               <Save className="h-4 w-4" />
             </Button>
           )}
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
             <X className="h-4 w-4" />
           </Button>
         </div>

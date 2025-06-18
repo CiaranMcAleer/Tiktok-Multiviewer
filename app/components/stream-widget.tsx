@@ -281,13 +281,13 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
             <span className="font-medium truncate">{widget.title}</span>
           </div>
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={refreshContent}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={refreshContent} aria-label="Refresh content">
               <RefreshCw className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => window.open(widget.url, "_blank")}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => window.open(widget.url, "_blank")} aria-label="Open in new tab">
               <ExternalLink className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -327,16 +327,16 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
           <span className="font-medium truncate">{widget.title}</span>
         </div>
         <div className="flex gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={refreshContent}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={refreshContent} aria-label="Refresh content">
             <RefreshCw className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => window.open(widget.url, "_blank")}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => window.open(widget.url, "_blank")} aria-label="Open in new tab">
             <ExternalLink className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={openPopupWindow}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={openPopupWindow} aria-label="Open in popup">
             <Maximize2 className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
             <X className="h-4 w-4" />
           </Button>
         </div>

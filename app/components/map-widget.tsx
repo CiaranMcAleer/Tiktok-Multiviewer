@@ -204,10 +204,11 @@ export default function MapWidget({ title, onRemove, theme }: MapWidgetProps) {
               className="h-8 w-8"
               onClick={centerOnUserLocation}
               title="Center on current location"
+              aria-label="Center map on current location"
             >
               <MapPin className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
               <X className="h-4 w-4" />
             </Button>
           </div>

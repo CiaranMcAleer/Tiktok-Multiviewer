@@ -55,7 +55,6 @@ function MultiviewerApp() {
   const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false)
   const [isRSSDialogOpen, setIsRSSDialogOpen] = useState(false)
   const [isWeatherDialogOpen, setIsWeatherDialogOpen] = useState(false)
-  const [isTwitchDialogOpen, setIsTwitchDialogOpen] = useState(false)
   const [loadCode, setLoadCode] = useState("")
   const [websiteUrl, setWebsiteUrl] = useState("")
   const [websiteTitle, setWebsiteTitle] = useState("")
@@ -66,8 +65,6 @@ function MultiviewerApp() {
   const [weatherLocation, setWeatherLocation] = useState("")
   const [weatherLatitude, setWeatherLatitude] = useState<number | null>(null)
   const [weatherLongitude, setWeatherLongitude] = useState<number | null>(null)
-  const [twitchChannel, setTwitchChannel] = useState("")
-  const [twitchTitle, setTwitchTitle] = useState("")
   const [currentHintIndex, setCurrentHintIndex] = useState(0)
   const [gridColumns, setGridColumns] = useState(2)
   const [gridRows, setGridRows] = useState(2)
@@ -77,17 +74,17 @@ function MultiviewerApp() {
   const popupManager = useRef<PopupManager>(PopupManager.getInstance())
 
   // Hints system - cycles through different helpful tips
-  const hints = [
+  const hints = [ //TODO add more hints
     "Try @username for TikTok live streams",
     "Paste YouTube video URLs or video IDs",
+    "For usernames: tw:ninja (Twitch), yt:creator (YouTube), @user (TikTok)",
+    "Enter Twitch URLs (twitch.tv/username) or use tw:username prefix",
     "For streams: Use direct .m3u8 (HLS) or .mpd (DASH) URLs. CORS-enabled streams work best.",
     "For RSS: Try feeds like https://feeds.bbci.co.uk/news/rss.xml",
-    "Popular RSS feeds: https://rss.cnn.com/rss/edition.rss works great",
     "RSS feeds auto-refresh (adjustable from 5 seconds to 60 minutes)",
     "Weather widgets show current conditions and 3-day forecasts",
     "Weather data updates every 10 minutes automatically",
-    "Twitch widgets embed live streams - channel must be live to see content",
-    "Twitch streams support playback controls and direct links to Twitch",
+    "Twitch channels must be live to see content - supports playback controls",
     "Traffic cameras update every 20 seconds",
     "Use the + button for quick widgets like maps and notes",
     "Share your layout with the export button",
@@ -202,7 +199,33 @@ function MultiviewerApp() {
       title = title || "Twitch Stream"
     } else if (url) {
       // Auto-detect content type based on URL
-      if (url.includes("tiktok.com") || url.includes("@") || extractTikTokUsername(url)) {
+      if (url.includes("twitch.tv") || url.includes("twitch.com")) {
+        type = "twitch"
+        let channelName = url
+        
+        // Extract channel name from Twitch URL formats
+        const match = url.match(/twitch\.(?:tv|com)\/([a-zA-Z0-9_]{4,25})/)
+        if (match) {
+          channelName = match[1]
+        } else {
+          alert("Please enter a valid Twitch channel URL")
+          return
+        }
+        
+        url = `https://twitch.tv/${channelName}`
+        title = title || `twitch.tv/${channelName}`
+      } else if (url.startsWith("twitch:") || url.startsWith("tw:")) {
+        // Handle explicit Twitch prefixes: "twitch:username" or "tw:username"
+        type = "twitch"
+        const channelName = url.replace(/^(twitch:|tw:)/, "").replace(/^@?/, "")
+        if (!/^[a-zA-Z0-9_]{4,25}$/.test(channelName)) {
+          alert("Invalid Twitch channel name. Use 4-25 characters (letters, numbers, underscore)")
+          return
+        }
+        
+        url = `https://twitch.tv/${channelName}`
+        title = title || `twitch.tv/${channelName}`
+      } else if (url.includes("tiktok.com") || url.includes("@") || extractTikTokUsername(url)) {
         type = "tiktok"
         const username = extractTikTokUsername(url)
         if (!username) {
@@ -221,6 +244,12 @@ function MultiviewerApp() {
           url = `https://www.youtube.com/watch?v=${url}`
         }
         title = title || "YouTube Video"
+      } else if (url.startsWith("yt:") || url.startsWith("youtube:")) {
+        // Handle explicit YouTube prefixes: "yt:channel" or "youtube:channel"
+        type = "youtube"
+        const channelName = url.replace(/^(yt:|youtube:)/, "").replace(/^@?/, "")
+        url = `https://www.youtube.com/@${channelName}`
+        title = title || `YouTube: ${channelName}`
       } else if (url.includes(".m3u8") || url.includes(".mpd") || url.includes("hls") || url.includes("dash") || url.includes("stream")) {
         type = "stream"
         // Detect stream type based on URL
@@ -240,6 +269,33 @@ function MultiviewerApp() {
       } else if (url.includes("trafficwatchni.com") || url.includes("traffic")) {
         type = "trafficcam"
         title = title || "Traffic Camera"
+      } else if (/^[a-zA-Z0-9_]{4,25}$/.test(url.replace(/^@?/, ""))) {
+        // Handle ambiguous usernames - show options to user
+        const cleanUsername = url.replace(/^@?/, "")
+        const confirmed = confirm(
+          `"${cleanUsername}" could be a username for multiple services.\n\n` +
+          `Click OK to treat as TikTok (@${cleanUsername})\n` +
+          `Click Cancel to specify the service.\n\n` +
+          `For other services, use prefixes:\n` +
+          `• tw:${cleanUsername} for Twitch\n` +
+          `• yt:${cleanUsername} for YouTube`
+        )
+        
+        if (confirmed) {
+          // Default to TikTok for @username pattern
+          type = "tiktok"
+          url = `https://www.tiktok.com/@${cleanUsername}/live`
+          title = title || cleanUsername
+        } else {
+          alert(
+            `To specify the service, use these prefixes:\n\n` +
+            `• tw:${cleanUsername} or twitch:${cleanUsername} for Twitch\n` +
+            `• yt:${cleanUsername} or youtube:${cleanUsername} for YouTube\n` +
+            `• @${cleanUsername} for TikTok (or just use TikTok URL)\n\n` +
+            `Or paste the full URL from the service.`
+          )
+          return
+        }
       } else {
         // If URL doesn't match known patterns, treat as traffic cam
         type = "trafficcam"
@@ -262,6 +318,7 @@ function MultiviewerApp() {
       streamType: type === "stream" ? streamType : undefined,
       feedUrl: type === "rss" ? url : undefined,
       maxItems: type === "rss" ? 10 : undefined,
+      twitchChannel: type === "twitch" ? url.split('/').pop() : undefined,
     }
 
     setWidgets([...widgets, newWidget])
@@ -392,37 +449,6 @@ function MultiviewerApp() {
 
   const removeWidget = (id: string) => {
     setWidgets(widgets.filter(w => w.id !== id))
-  }
-
-  const addTwitchWidget = () => {
-    if (widgets.length >= 10) {
-      alert("Maximum 10 widgets allowed")
-      return
-    }
-
-    if (!twitchChannel.trim()) {
-      alert("Please enter a Twitch channel name")
-      return
-    }
-
-    const cleanChannel = twitchChannel.trim().replace(/^@?/, "") // Remove @ if present
-    if (!/^[a-zA-Z0-9_]{4,25}$/.test(cleanChannel)) {
-      alert("Invalid channel name. Use 4-25 characters (letters, numbers, underscore)")
-      return
-    }
-
-    const newWidget: Widget = {
-      id: Date.now().toString(),
-      type: "twitch",
-      url: `https://twitch.tv/${cleanChannel}`,
-      title: twitchTitle.trim() || `twitch.tv/${cleanChannel}`,
-      twitchChannel: cleanChannel,
-    }
-
-    setWidgets([...widgets, newWidget])
-    setTwitchChannel("")
-    setTwitchTitle("")
-    setIsTwitchDialogOpen(false)
   }
 
   const updateTwitchWidget = (id: string, channel: string) => {
@@ -637,10 +663,6 @@ function MultiviewerApp() {
                     <CloudSun className="h-4 w-4 mr-2" />
                     Weather
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setIsTwitchDialogOpen(true)}>
-                    <Tv className="h-4 w-4 mr-2" />
-                    Twitch Stream
-                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full">
@@ -652,7 +674,7 @@ function MultiviewerApp() {
           {/* Controls */}
           <div className="flex gap-2 mb-2">
             <Input
-              placeholder="Enter any URL or use + for widgets"
+              placeholder="YouTube, TikTok, Twitch URLs or tw:ninja, yt:creator, @user"
               value={inputUrl}
               onChange={(e) => setInputUrl(e.target.value)}
               onKeyPress={(e) => e.key === "Enter" && addWidget()}
@@ -959,43 +981,6 @@ function MultiviewerApp() {
                       disabled={!weatherLocation}
                     >
                       Add Weather Widget
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-
-              <Dialog open={isTwitchDialogOpen} onOpenChange={setIsTwitchDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button style={{ display: "none" }}>Twitch Dialog</Button>
-                </DialogTrigger>
-                <DialogContent className="z-[9999]">
-                  <DialogHeader>
-                    <DialogTitle>Add Twitch Stream Widget</DialogTitle>
-                  </DialogHeader>
-                  <div className="mt-4 space-y-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Twitch Channel</label>
-                      <Input
-                        value={twitchChannel}
-                        onChange={(e) => setTwitchChannel(e.target.value)}
-                        placeholder="ninja, pokimane, shroud..."
-                        onKeyPress={(e) => e.key === "Enter" && addTwitchWidget()}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Widget Title (optional)</label>
-                      <Input
-                        value={twitchTitle}
-                        onChange={(e) => setTwitchTitle(e.target.value)}
-                        placeholder="Twitch Stream"
-                        onKeyPress={(e) => e.key === "Enter" && addTwitchWidget()}
-                      />
-                    </div>
-                    <div className="text-sm text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 p-3 rounded-md">
-                      <strong>Info:</strong> Embeds live Twitch streams. Channel must be live for the stream to appear. You can control playback and open the stream in Twitch directly.
-                    </div>
-                    <Button onClick={addTwitchWidget} className="w-full">
-                      Add Twitch Widget
                     </Button>
                   </div>
                 </DialogContent>

@@ -405,7 +405,7 @@ export default function WorldTimeWidget({
             </span>
           )}
         </div>
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove}>
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
           <X className="h-4 w-4" />
         </Button>
       </CardHeader>
