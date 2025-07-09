@@ -33,12 +33,12 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
     return () => clearInterval(interval)
   }, [widget.id])
 
-  // Set up auto-refresh for traffic cams - changed to 20 seconds
+  // Set up auto-refresh for traffic cams - changed to 5 seconds
   useEffect(() => {
     if (widget.type === "trafficcam" && widget.refreshInterval) {
       refreshTimerRef.current = setInterval(() => {
         refreshContent()
-      }, 20000) // Changed from widget.refreshInterval to fixed 20 seconds
+      }, 5000) // Changed from widget.refreshInterval to fixed 5 seconds
     }
 
     return () => {
@@ -199,7 +199,7 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
               onError={() => setEmbedError(true)}
             />
             <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-              Live • Refreshes every 20s
+              Live • Refreshes every 5s
             </div>
           </div>
         )
