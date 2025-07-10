@@ -50,7 +50,7 @@ export default function WebsiteWidget({ title, url, onRemove, theme }: WebsiteWi
             <Globe className="h-12 w-12 mx-auto mb-4 text-gray-400" />
             <p className="text-red-500 mb-2">Failed to load website</p>
             <p className="text-sm text-gray-500 mb-4">
-              This website doesn't allow embedding due to security policies (X-Frame-Options or CSP)
+              This website doesn&apos;t allow embedding due to security policies (X-Frame-Options or CSP)
             </p>
             <div className="space-y-2">
               <Button onClick={() => window.open(url, "_blank")} variant="outline">

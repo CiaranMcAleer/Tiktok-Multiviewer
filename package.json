@@ -87,6 +87,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/video.js": "^7.3.58",
+    "eslint": "^9.30.1",
+    "eslint-config-next": "^15.3.5",
     "jest": "^30.0.0",
     "jest-environment-jsdom": "^30.0.0",
     "postcss": "^8.5",

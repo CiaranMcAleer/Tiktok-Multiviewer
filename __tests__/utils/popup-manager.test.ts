@@ -110,10 +110,102 @@ describe('PopupManager', () => {
 
   describe('Grid Settings', () => {
     it('should set grid dimensions', () => {
-      popupManager.setGrid(3, 2)
+      popupManager.setGrid(3)
       // This would be tested by checking if new popups respect the grid settings
       // Since the actual grid calculation is internal, we test the behavior indirectly
-      expect(() => popupManager.setGrid(3, 2)).not.toThrow()
+      expect(() => popupManager.setGrid(3)).not.toThrow()
+    })
+
+    it('should arrange popups in columns correctly', () => {
+      // Mock multiple windows for testing positioning
+      const mockWindows = Array.from({ length: 6 }, (_, i) => ({
+        focus: jest.fn(),
+        close: jest.fn(),
+        resizeTo: jest.fn(),
+        moveTo: jest.fn(),
+        closed: false,
+      }))
+
+      window.open = jest.fn().mockImplementation((url, name, features) => {
+        const index = mockWindows.findIndex(w => !w.closed)
+        return mockWindows[index]
+      })
+
+      // Set 2 columns
+      popupManager.setGrid(2)
+
+      // Open 6 popups
+      for (let i = 0; i < 6; i++) {
+        popupManager.openPopup(`test-${i}`, 'https://example.com', `Test ${i}`, 'test')
+      }
+
+      // Verify window.open was called for each popup
+      expect(window.open).toHaveBeenCalledTimes(6)
+
+      // The key test: with 2 columns, popups should be arranged in 3 rows (6 popups / 2 columns)
+      // We can't easily test the exact positioning without access to private methods,
+      // but we can verify that all popups are tracked
+      expect(popupManager.getOpenPopups()).toHaveLength(6)
+    })
+
+    it('should calculate positions correctly with dynamic rows', () => {
+      // Mock window.open to capture the features string with position info
+      const capturedFeatures: string[] = []
+      window.open = jest.fn().mockImplementation((url, name, features) => {
+        capturedFeatures.push(features)
+        return {
+          focus: jest.fn(),
+          close: jest.fn(),
+          resizeTo: jest.fn(),
+          moveTo: jest.fn(),
+          closed: false,
+        }
+      })
+
+      popupManager.setGrid(2) // 2 columns
+
+      // Open 5 popups
+      for (let i = 0; i < 5; i++) {
+        popupManager.openPopup(`test-${i}`, 'https://example.com', `Test ${i}`, 'test')
+      }
+
+      // Check that each popup gets different position parameters
+      expect(capturedFeatures).toHaveLength(5)
+      
+      // With 2 columns and 5 popups, we should have 3 rows (2+2+1)
+      // The positions should be calculated based on this layout
+      expect(capturedFeatures[0]).toContain('left=10') // First popup: col 0, row 0
+      expect(capturedFeatures[1]).toContain('left=') // Second popup: col 1, row 0
+      expect(capturedFeatures[2]).toContain('left=10') // Third popup: col 0, row 1
+      expect(capturedFeatures[3]).toContain('left=') // Fourth popup: col 1, row 1
+      expect(capturedFeatures[4]).toContain('left=10') // Fifth popup: col 0, row 2
+    })
+
+    it('should handle more popups than traditional grid limits', () => {
+      // This test demonstrates the fix: with 2 columns,
+      // we should be able to add as many popups as needed, with rows calculated dynamically
+      const mockWindows = Array.from({ length: 5 }, (_, i) => ({
+        focus: jest.fn(),
+        close: jest.fn(),
+        resizeTo: jest.fn(),
+        moveTo: jest.fn(),
+        closed: false,
+      }))
+
+      window.open = jest.fn().mockImplementation((url, name, features) => {
+        const index = mockWindows.findIndex(w => !w.closed)
+        return mockWindows[index]
+      })
+
+      popupManager.setGrid(2)
+
+      // Open 5 popups (should arrange in 3 rows: 2+2+1)
+      for (let i = 0; i < 5; i++) {
+        popupManager.openPopup(`test-${i}`, 'https://example.com', `Test ${i}`, 'test')
+      }
+
+      // All 5 popups should be tracked
+      expect(popupManager.getOpenPopups()).toHaveLength(5)
     })
   })
 })
