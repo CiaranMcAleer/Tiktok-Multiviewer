@@ -67,7 +67,6 @@ function MultiviewerApp() {
   const [weatherLongitude, setWeatherLongitude] = useState<number | null>(null)
   const [currentHintIndex, setCurrentHintIndex] = useState(0)
   const [gridColumns, setGridColumns] = useState(2)
-  const [gridRows, setGridRows] = useState(2)
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
   const { theme, toggleTheme } = useTheme()
@@ -134,8 +133,8 @@ function MultiviewerApp() {
 
   // Update popup grid when grid settings change
   useEffect(() => {
-    popupManager.current.setGrid(gridColumns, gridRows)
-  }, [gridColumns, gridRows])
+    popupManager.current.setGrid(gridColumns)
+  }, [gridColumns])
 
   const extractTikTokUsername = (url: string): string | null => {
     const patterns = [
@@ -616,7 +615,7 @@ function MultiviewerApp() {
   }
 
   const updateGridSettings = () => {
-    popupManager.current.setGrid(gridColumns, gridRows)
+    popupManager.current.setGrid(gridColumns)
     setIsGridDialogOpen(false)
   }
 
@@ -750,41 +749,28 @@ function MultiviewerApp() {
                     <DialogTitle>Popup Grid Settings</DialogTitle>
                   </DialogHeader>
                   <div className="mt-4 space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Columns</label>
-                        <Select
-                          value={gridColumns.toString()}
-                          onValueChange={(value) => setGridColumns(Number.parseInt(value))}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select columns" />
-                          </SelectTrigger>
-                          <SelectContent className="z-[10000]">
-                            <SelectItem value="1">1 Column</SelectItem>
-                            <SelectItem value="2">2 Columns</SelectItem>
-                            <SelectItem value="3">3 Columns</SelectItem>
-                            <SelectItem value="4">4 Columns</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Rows</label>
-                        <Select
-                          value={gridRows.toString()}
-                          onValueChange={(value) => setGridRows(Number.parseInt(value))}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select rows" />
-                          </SelectTrigger>
-                          <SelectContent className="z-[10000]">
-                            <SelectItem value="1">1 Row</SelectItem>
-                            <SelectItem value="2">2 Rows</SelectItem>
-                            <SelectItem value="3">3 Rows</SelectItem>
-                            <SelectItem value="4">4 Rows</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Columns</label>
+                      <Select
+                        value={gridColumns.toString()}
+                        onValueChange={(value) => setGridColumns(Number.parseInt(value))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select columns" />
+                        </SelectTrigger>
+                        <SelectContent className="z-[10000]">
+                          <SelectItem value="1">1 Column</SelectItem>
+                          <SelectItem value="2">2 Columns</SelectItem>
+                          <SelectItem value="3">3 Columns</SelectItem>
+                          <SelectItem value="4">4 Columns</SelectItem>
+                          <SelectItem value="5">5 Columns</SelectItem>
+                          <SelectItem value="6">6 Columns</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="text-sm text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-md">
+                      <strong>Note:</strong> Rows are automatically calculated based on the number of popups and columns. 
+                      This ensures all popups are properly positioned without overlap.
                     </div>
                     <Button onClick={updateGridSettings} className="w-full">
                       Apply Grid Settings

@@ -16,7 +16,6 @@ class PopupManager {
   private static instance: PopupManager
   private popups: Map<string, PopupWindow> = new Map()
   private columns = 2
-  private rows = 2
   private padding = 10
   private checkInterval: NodeJS.Timeout | null = null
 
@@ -32,9 +31,8 @@ class PopupManager {
     return PopupManager.instance
   }
 
-  public setGrid(columns: number, rows: number): void {
+  public setGrid(columns: number): void {
     this.columns = columns
-    this.rows = rows
     this.rearrangeAll()
   }
 
@@ -118,15 +116,18 @@ class PopupManager {
     const screenWidth = window.screen.width
     const screenHeight = window.screen.height
 
-    // Calculate cell dimensions
-    const cellWidth = Math.floor((screenWidth - (this.columns + 1) * this.padding) / this.columns)
-    const cellHeight = Math.floor((screenHeight - (this.rows + 1) * this.padding) / this.rows)
-
     // Count current open popups
     const openCount = this.getOpenPopups().length
+    
+    // Calculate rows dynamically based on number of widgets and columns
+    const rows = Math.ceil((openCount + 1) / this.columns)
+
+    // Calculate cell dimensions
+    const cellWidth = Math.floor((screenWidth - (this.columns + 1) * this.padding) / this.columns)
+    const cellHeight = Math.floor((screenHeight - (rows + 1) * this.padding) / rows)
 
     // Calculate row and column for the new popup
-    const row = Math.floor(openCount / this.columns) % this.rows
+    const row = Math.floor(openCount / this.columns)
     const col = openCount % this.columns
 
     // Calculate position
@@ -140,20 +141,23 @@ class PopupManager {
 
   private rearrangeAll(): void {
     const openPopupIds = this.getOpenPopups()
+    
+    // Calculate rows dynamically based on number of widgets and columns
+    const rows = Math.ceil(openPopupIds.length / this.columns)
+
+    // Calculate cell dimensions
+    const screenWidth = window.screen.width
+    const screenHeight = window.screen.height
+    const cellWidth = Math.floor((screenWidth - (this.columns + 1) * this.padding) / this.columns)
+    const cellHeight = Math.floor((screenHeight - (rows + 1) * this.padding) / rows)
 
     // Rearrange each popup
     openPopupIds.forEach((id, index) => {
       const popup = this.popups.get(id)
       if (popup && popup.window && !popup.window.closed) {
         // Calculate new position
-        const row = Math.floor(index / this.columns) % this.rows
+        const row = Math.floor(index / this.columns)
         const col = index % this.columns
-
-        // Calculate cell dimensions
-        const screenWidth = window.screen.width
-        const screenHeight = window.screen.height
-        const cellWidth = Math.floor((screenWidth - (this.columns + 1) * this.padding) / this.columns)
-        const cellHeight = Math.floor((screenHeight - (this.rows + 1) * this.padding) / this.rows)
 
         // Calculate position
         const left = col * (cellWidth + this.padding) + this.padding

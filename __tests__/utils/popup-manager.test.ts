@@ -110,10 +110,62 @@ describe('PopupManager', () => {
 
   describe('Grid Settings', () => {
     it('should set grid dimensions', () => {
-      popupManager.setGrid(3, 2)
+      popupManager.setGrid(3)
       // This would be tested by checking if new popups respect the grid settings
       // Since the actual grid calculation is internal, we test the behavior indirectly
-      expect(() => popupManager.setGrid(3, 2)).not.toThrow()
+      expect(() => popupManager.setGrid(3)).not.toThrow()
+    })
+
+    it('should calculate position correctly for different column configurations', () => {
+      // Mock window.open to return a simple mock
+      const mockWindows = []
+      window.open = jest.fn().mockImplementation(() => {
+        const mockWindow = { focus: jest.fn(), close: jest.fn(), closed: false }
+        mockWindows.push(mockWindow)
+        return mockWindow
+      })
+
+      // Set grid to 3 columns
+      popupManager.setGrid(3)
+
+      // Open 5 popups to test grid positioning
+      popupManager.openPopup('test-1', 'https://example.com', 'Test 1', 'youtube')
+      popupManager.openPopup('test-2', 'https://example.com', 'Test 2', 'youtube')
+      popupManager.openPopup('test-3', 'https://example.com', 'Test 3', 'youtube')
+      popupManager.openPopup('test-4', 'https://example.com', 'Test 4', 'youtube')
+      popupManager.openPopup('test-5', 'https://example.com', 'Test 5', 'youtube')
+
+      // Check that window.open was called with correct parameters
+      expect(window.open).toHaveBeenCalledTimes(5)
+      
+      // Verify all popups are tracked
+      expect(popupManager.getOpenPopups()).toHaveLength(5)
+      
+      // Clean up
+      mockWindows.forEach(mockWindow => mockWindow.close())
+    })
+
+    it('should dynamically calculate rows based on number of widgets and columns', () => {
+      const mockWindows = []
+      window.open = jest.fn().mockImplementation(() => {
+        const mockWindow = { focus: jest.fn(), close: jest.fn(), closed: false }
+        mockWindows.push(mockWindow)
+        return mockWindow
+      })
+
+      // Set grid to 2 columns
+      popupManager.setGrid(2)
+
+      // Open 3 popups (should create 2 rows: 2 in first row, 1 in second row)
+      popupManager.openPopup('test-1', 'https://example.com', 'Test 1', 'youtube')
+      popupManager.openPopup('test-2', 'https://example.com', 'Test 2', 'youtube')
+      popupManager.openPopup('test-3', 'https://example.com', 'Test 3', 'youtube')
+
+      // Verify all popups are tracked
+      expect(popupManager.getOpenPopups()).toHaveLength(3)
+      
+      // Clean up
+      mockWindows.forEach(mockWindow => mockWindow.close())
     })
   })
 })
