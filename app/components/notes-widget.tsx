@@ -7,6 +7,7 @@ import { X, FileText, Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
+import { trackWidgetCreated, trackWidgetRemoved, notesAnalytics } from "@/lib/analytics"
 
 interface NotesWidgetProps {
   title: string
@@ -14,11 +15,24 @@ interface NotesWidgetProps {
   onRemove: () => void
   onContentChange: (content: string) => void
   theme: "light" | "dark"
+  widgetId: string
 }
 
-export default function NotesWidget({ title, content, onRemove, onContentChange, theme }: NotesWidgetProps) {
+export default function NotesWidget({ title, content, onRemove, onContentChange, theme, widgetId }: NotesWidgetProps) {
   const [localContent, setLocalContent] = useState(content)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [hasEmittedFeatureFlag, setHasEmittedFeatureFlag] = useState(false)
+
+  // Emit feature flag on component mount
+  useEffect(() => {
+    if (!hasEmittedFeatureFlag) {
+      trackWidgetCreated('notes', widgetId, {
+        content_length: content.length,
+        has_content: content.length > 0
+      })
+      setHasEmittedFeatureFlag(true)
+    }
+  }, [widgetId, content.length, hasEmittedFeatureFlag])
 
   useEffect(() => {
     setLocalContent(content)
@@ -27,12 +41,28 @@ export default function NotesWidget({ title, content, onRemove, onContentChange,
 
   const handleContentChange = (newContent: string) => {
     setLocalContent(newContent)
-    setHasUnsavedChanges(newContent !== content)
+    const hasChanges = newContent !== content
+    setHasUnsavedChanges(hasChanges)
+    
+    // Track content change
+    notesAnalytics.contentChanged(widgetId, hasChanges)
   }
 
   const saveContent = () => {
     onContentChange(localContent)
     setHasUnsavedChanges(false)
+    
+    // Track content save
+    notesAnalytics.contentSaved(widgetId, localContent.length)
+  }
+
+  // Track widget removal
+  const handleRemove = () => {
+    trackWidgetRemoved('notes', widgetId, {
+      content_length: localContent.length,
+      had_unsaved_changes: hasUnsavedChanges
+    })
+    onRemove()
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -60,7 +90,7 @@ export default function NotesWidget({ title, content, onRemove, onContentChange,
               <Save className="h-4 w-4" />
             </Button>
           )}
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleRemove} aria-label="Remove widget">
             <X className="h-4 w-4" />
           </Button>
         </div>

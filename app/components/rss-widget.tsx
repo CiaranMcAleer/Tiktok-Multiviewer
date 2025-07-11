@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import type { Widget } from "../types/widget"
+import { trackWidgetCreated, trackWidgetRemoved, rssAnalytics } from "@/lib/analytics"
 
 // RSS Parser types (since @types/rss-parser doesn't exist)
 interface RSSItem {
@@ -43,9 +44,31 @@ export default function RSSWidget({ widget, onRemove, theme }: RSSWidgetProps) {
   const [error, setError] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const refreshTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const hasEmittedFeatureFlag = useRef(false)
 
   const maxItems = widget.maxItems || 10
   const refreshInterval = widget.refreshInterval || 5 * 60 * 1000 // Default 5 minutes
+
+  // Emit feature flag on component mount
+  useEffect(() => {
+    if (!hasEmittedFeatureFlag.current) {
+      trackWidgetCreated('rss', widget.id, {
+        feed_url: widget.feedUrl || widget.url,
+        max_items: maxItems,
+        refresh_interval: refreshInterval
+      })
+      hasEmittedFeatureFlag.current = true
+    }
+  }, [widget.id, widget.feedUrl, widget.url, maxItems, refreshInterval])
+
+  // Track widget removal
+  const handleRemove = () => {
+    trackWidgetRemoved('rss', widget.id, {
+      feed_url: widget.feedUrl || widget.url,
+      had_error: !!error
+    })
+    onRemove()
+  }
 
   const parseFeed = async (feedUrl: string): Promise<RSSFeed> => {
     // Try multiple CORS proxies for better reliability
@@ -205,6 +228,9 @@ export default function RSSWidget({ widget, onRemove, theme }: RSSWidgetProps) {
       const feedData = await parseFeed(feedUrl)
       setFeed(feedData)
       setLastUpdated(new Date())
+      
+      // Track successful feed load
+      rssAnalytics.feedLoaded(widget.id, feedUrl, feedData.items.length)
     } catch (err) {
       let errorMessage = "Failed to load RSS feed"
       
@@ -226,6 +252,9 @@ export default function RSSWidget({ widget, onRemove, theme }: RSSWidgetProps) {
       
       setError(errorMessage)
       console.error("RSS fetch error:", err)
+      
+      // Track feed error
+      rssAnalytics.feedError(widget.id, feedUrl, errorMessage)
     } finally {
       setLoading(false)
     }
@@ -254,10 +283,17 @@ export default function RSSWidget({ widget, onRemove, theme }: RSSWidgetProps) {
     }
   }
 
-  const openLink = (url: string) => {
+  const openLink = (url: string, title?: string) => {
     if (url) {
+      // Track item click
+      rssAnalytics.itemClicked(widget.id, url, title || 'Unknown')
       window.open(url, "_blank", "noopener,noreferrer")
     }
+  }
+
+  const handleRefresh = () => {
+    rssAnalytics.feedRefreshed(widget.id, widget.feedUrl || widget.url || '')
+    fetchFeed()
   }
 
   // Initial fetch and setup auto-refresh
@@ -290,13 +326,13 @@ export default function RSSWidget({ widget, onRemove, theme }: RSSWidgetProps) {
           <Button
             variant="ghost"
             size="icon"
-            onClick={fetchFeed}
+            onClick={handleRefresh}
             disabled={loading}
             className="h-6 w-6 rounded-full"
           >
             <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} />
           </Button>
-          <Button variant="ghost" size="icon" onClick={onRemove} className="h-6 w-6 rounded-full">
+          <Button variant="ghost" size="icon" onClick={handleRemove} className="h-6 w-6 rounded-full">
             <X className="h-3 w-3" />
           </Button>
         </div>
@@ -315,7 +351,7 @@ export default function RSSWidget({ widget, onRemove, theme }: RSSWidgetProps) {
             <Button
               variant="outline"
               size="sm"
-              onClick={fetchFeed}
+              onClick={handleRefresh}
               className="mt-1"
             >
               Try Again
@@ -342,7 +378,7 @@ export default function RSSWidget({ widget, onRemove, theme }: RSSWidgetProps) {
                         ? "border-gray-600 hover:bg-gray-700"
                         : "border-gray-200 hover:bg-gray-50"
                     }`}
-                    onClick={() => openLink(item.link || "")}
+                    onClick={() => openLink(item.link || "", item.title)}
                   >
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <h4 className={`font-medium text-xs leading-tight line-clamp-2 ${

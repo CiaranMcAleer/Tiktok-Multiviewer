@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { trackWidgetCreated, trackWidgetRemoved, worldTimeAnalytics } from "@/lib/analytics"
 
 interface WorldTimeWidgetProps {
   title: string
@@ -14,6 +15,7 @@ interface WorldTimeWidgetProps {
   onRemove: () => void
   onCityChange: (city: string, timezone: string) => void
   theme: "light" | "dark"
+  widgetId: string
 }
 
 interface WorldTimeData {
@@ -32,6 +34,7 @@ export default function WorldTimeWidget({
   onRemove,
   onCityChange,
   theme,
+  widgetId,
 }: WorldTimeWidgetProps) {
   const [currentTime, setCurrentTime] = useState<string>("")
   const [currentDate, setCurrentDate] = useState<string>("")
@@ -43,6 +46,29 @@ export default function WorldTimeWidget({
   const [error, setError] = useState<string | null>(null)
   const [useApiFallback, setUseApiFallback] = useState(false)
   const lastSyncRef = useRef<number>(0)
+  const hasEmittedFeatureFlag = useRef(false)
+
+  // Emit feature flag on component mount
+  useEffect(() => {
+    if (!hasEmittedFeatureFlag.current) {
+      trackWidgetCreated('worldtime', widgetId, {
+        city: city,
+        timezone: timezone,
+        has_timezone: !!timezone
+      })
+      hasEmittedFeatureFlag.current = true
+    }
+  }, [widgetId, city, timezone])
+
+  // Track widget removal
+  const handleRemove = () => {
+    trackWidgetRemoved('worldtime', widgetId, {
+      city: city,
+      timezone: timezone,
+      had_error: !!error
+    })
+    onRemove()
+  }
 
   // Fallback timezone list in case API fails
   const FALLBACK_TIMEZONES = [
@@ -218,13 +244,20 @@ export default function WorldTimeWidget({
       setUseApiFallback(false)
       lastSyncRef.current = now
 
+      // Track successful time data load
+      worldTimeAnalytics.timeDataLoaded(widgetId, timezone, 'worldtime_api')
+
       console.log(`Time synced for ${timezone}${isResync ? " (resync)" : ""}`)
     } catch (error) {
       console.warn("API fetch failed, using browser fallback:", error)
 
       if (!isResync) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error'
         setError("Using browser timezone")
         setUseApiFallback(true)
+
+        // Track API error
+        worldTimeAnalytics.timeDataError(widgetId, timezone, errorMessage)
 
         // Create fallback data using browser's Intl API
         try {
@@ -246,9 +279,13 @@ export default function WorldTimeWidget({
             unixtime: Math.floor(now.getTime() / 1000),
           }
           setTimeData(fallbackData)
+          
+          // Track fallback data load
+          worldTimeAnalytics.timeDataLoaded(widgetId, timezone, 'browser_fallback')
         } catch (fallbackError) {
           console.error("Fallback also failed:", fallbackError)
           setError("Timezone not supported")
+          worldTimeAnalytics.timeDataError(widgetId, timezone, 'Timezone not supported')
         }
       }
     } finally {
@@ -376,6 +413,9 @@ export default function WorldTimeWidget({
     const parts = selectedTimezone.split("/")
     const cityName = parts[parts.length - 1].replace(/_/g, " ")
 
+    // Track timezone change
+    worldTimeAnalytics.timezoneChanged(widgetId, timezone, selectedTimezone)
+
     onCityChange(cityName, selectedTimezone)
     setOpen(false)
     setSearchValue("")
@@ -405,7 +445,7 @@ export default function WorldTimeWidget({
             </span>
           )}
         </div>
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
+        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleRemove} aria-label="Remove widget">
           <X className="h-4 w-4" />
         </Button>
       </CardHeader>

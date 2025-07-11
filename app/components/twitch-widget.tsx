@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import type { Widget } from "../types/widget"
+import { trackWidgetCreated, trackWidgetRemoved, twitchAnalytics } from "@/lib/analytics"
 
 interface TwitchWidgetProps {
   widget: Widget
@@ -22,8 +23,30 @@ export default function TwitchWidget({ widget, onRemove, onChannelChange, theme 
   const [isMuted, setIsMuted] = useState(false)
   const [isPlaying, setIsPlaying] = useState(true)
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const hasEmittedFeatureFlag = useRef(false)
 
   const channel = widget.twitchChannel || ""
+
+  // Emit feature flag on component mount
+  useEffect(() => {
+    if (!hasEmittedFeatureFlag.current) {
+      trackWidgetCreated('twitch', widget.id, {
+        channel: channel,
+        has_channel: !!channel
+      })
+      hasEmittedFeatureFlag.current = true
+    }
+  }, [widget.id, channel])
+
+  // Track widget removal
+  const handleRemove = () => {
+    trackWidgetRemoved('twitch', widget.id, {
+      channel: channel,
+      was_playing: isPlaying,
+      was_muted: isMuted
+    })
+    onRemove()
+  }
 
   const handleChannelChange = () => {
     if (!channelInput.trim()) {
@@ -37,6 +60,10 @@ export default function TwitchWidget({ widget, onRemove, onChannelChange, theme 
       return
     }
 
+    // Track channel change
+    const oldChannel = channel
+    twitchAnalytics.channelChanged(widget.id, oldChannel, cleanChannel)
+
     onChannelChange(cleanChannel)
     setChannelInput("")
     setIsEditing(false)
@@ -46,6 +73,11 @@ export default function TwitchWidget({ widget, onRemove, onChannelChange, theme 
   const handleIframeLoad = () => {
     setIsLoading(false)
     setError(null)
+    
+    // Track successful channel load
+    if (channel) {
+      twitchAnalytics.channelLoaded(widget.id, channel)
+    }
   }
 
   const handleIframeError = () => {
@@ -62,7 +94,11 @@ export default function TwitchWidget({ widget, onRemove, onChannelChange, theme 
           { type: isMuted ? "unmute" : "mute" },
           "https://player.twitch.tv"
         )
-        setIsMuted(!isMuted)
+        const newMutedState = !isMuted
+        setIsMuted(newMutedState)
+        
+        // Track mute toggle
+        twitchAnalytics.muteToggled(widget.id, newMutedState)
       } catch (e) {
         console.warn("Cannot control Twitch player audio:", e)
       }
@@ -78,7 +114,11 @@ export default function TwitchWidget({ widget, onRemove, onChannelChange, theme 
           { type: isPlaying ? "pause" : "play" },
           "https://player.twitch.tv"
         )
-        setIsPlaying(!isPlaying)
+        const newPlayingState = !isPlaying
+        setIsPlaying(newPlayingState)
+        
+        // Track play/pause toggle
+        twitchAnalytics.playPauseToggled(widget.id, newPlayingState)
       } catch (e) {
         console.warn("Cannot control Twitch player playback:", e)
       }
@@ -87,6 +127,8 @@ export default function TwitchWidget({ widget, onRemove, onChannelChange, theme 
 
   const openInTwitch = () => {
     if (channel) {
+      // Track external stream opening
+      twitchAnalytics.streamOpened(widget.id, channel)
       window.open(`https://twitch.tv/${channel}`, "_blank")
     }
   }
@@ -167,7 +209,7 @@ export default function TwitchWidget({ widget, onRemove, onChannelChange, theme 
           >
             <RefreshCw className="h-3 w-3" />
           </Button>
-          <Button variant="ghost" size="icon" onClick={onRemove} className="h-6 w-6 rounded-full">
+          <Button variant="ghost" size="icon" onClick={handleRemove} className="h-6 w-6 rounded-full">
             <X className="h-3 w-3" />
           </Button>
         </div>

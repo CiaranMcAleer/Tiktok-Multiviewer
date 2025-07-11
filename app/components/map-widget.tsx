@@ -4,18 +4,40 @@ import { useState, useEffect } from "react"
 import { X, Layers, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { trackWidgetCreated, trackWidgetRemoved, mapAnalytics } from "@/lib/analytics"
 
 interface MapWidgetProps {
   title: string
   onRemove: () => void
   theme: "light" | "dark"
+  widgetId: string
 }
 
-export default function MapWidget({ title, onRemove, theme }: MapWidgetProps) {
+export default function MapWidget({ title, onRemove, theme, widgetId }: MapWidgetProps) {
   const [map, setMap] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [locationError, setLocationError] = useState<string | null>(null)
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null)
+  const [hasEmittedFeatureFlag, setHasEmittedFeatureFlag] = useState(false)
+
+  // Emit feature flag on component mount
+  useEffect(() => {
+    if (!hasEmittedFeatureFlag) {
+      trackWidgetCreated('map', widgetId, {
+        theme: theme
+      })
+      setHasEmittedFeatureFlag(true)
+    }
+  }, [widgetId, theme, hasEmittedFeatureFlag])
+
+  // Track widget removal
+  const handleRemove = () => {
+    trackWidgetRemoved('map', widgetId, {
+      had_location_error: !!locationError,
+      user_location: userLocation ? `${userLocation[0]},${userLocation[1]}` : null
+    })
+    onRemove()
+  }
 
   const mapLayers = {
     osm: {
@@ -50,12 +72,19 @@ export default function MapWidget({ title, onRemove, theme }: MapWidgetProps) {
           (position) => {
             const { latitude, longitude } = position.coords
             setUserLocation([latitude, longitude])
+            
+            // Track successful location load
+            mapAnalytics.mapLoaded(widgetId, latitude, longitude)
           },
           (error) => {
             console.error("Geolocation error:", error)
             setLocationError(error.message)
             // Fallback to Belfast if geolocation fails
-            setUserLocation([54.5973, -5.9301])
+            const fallbackLocation: [number, number] = [54.5973, -5.9301]
+            setUserLocation(fallbackLocation)
+            
+            // Track location error
+            mapAnalytics.locationError(widgetId, error.message)
           },
           {
             enableHighAccuracy: true,
@@ -66,7 +95,11 @@ export default function MapWidget({ title, onRemove, theme }: MapWidgetProps) {
       } else {
         setLocationError("Geolocation not supported")
         // Fallback to Belfast if geolocation not supported
-        setUserLocation([54.5973, -5.9301])
+        const fallbackLocation: [number, number] = [54.5973, -5.9301]
+        setUserLocation(fallbackLocation)
+        
+        // Track geolocation not supported
+        mapAnalytics.locationError(widgetId, "Geolocation not supported")
       }
     }
 
@@ -165,10 +198,14 @@ export default function MapWidget({ title, onRemove, theme }: MapWidgetProps) {
 
           setUserLocation(newLocation)
           setLocationError(null)
+          
+          // Track location centering
+          mapAnalytics.locationCentered(widgetId, latitude, longitude)
         },
         (error) => {
           console.error("Geolocation error:", error)
           setLocationError(error.message)
+          mapAnalytics.locationError(widgetId, error.message)
         },
       )
     }
@@ -208,7 +245,7 @@ export default function MapWidget({ title, onRemove, theme }: MapWidgetProps) {
             >
               <MapPin className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleRemove} aria-label="Remove widget">
               <X className="h-4 w-4" />
             </Button>
           </div>

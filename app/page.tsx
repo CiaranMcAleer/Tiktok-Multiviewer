@@ -1043,7 +1043,7 @@ function MultiviewerApp() {
                 </div>
 
                 {widget.type === "map" ? (
-                  <MapWidget title={widget.title} onRemove={() => removeWidget(widget.id)} theme={theme} />
+                  <MapWidget title={widget.title} onRemove={() => removeWidget(widget.id)} theme={theme} widgetId={widget.id} />
                 ) : widget.type === "worldtime" ? (
                   <WorldTimeWidget
                     title={widget.title}
@@ -1052,6 +1052,7 @@ function MultiviewerApp() {
                     onRemove={() => removeWidget(widget.id)}
                     onCityChange={(city, timezone) => updateWorldTimeWidget(widget.id, city, timezone)}
                     theme={theme}
+                    widgetId={widget.id}
                   />
                 ) : widget.type === "website" ? (
                   <WebsiteWidget
@@ -1067,6 +1068,7 @@ function MultiviewerApp() {
                     onRemove={() => removeWidget(widget.id)}
                     onContentChange={(content) => updateNotesWidget(widget.id, content)}
                     theme={theme}
+                    widgetId={widget.id}
                   />
                 ) : widget.type === "stream" ? (
                   <VideoStreamWidget

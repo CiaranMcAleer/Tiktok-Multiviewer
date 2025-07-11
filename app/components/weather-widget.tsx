@@ -19,6 +19,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import type { Widget } from "../types/widget"
+import { trackWidgetCreated, trackWidgetRemoved, weatherAnalytics } from "@/lib/analytics"
 
 interface LocationResult {
   id: number
@@ -73,8 +74,32 @@ export default function WeatherWidget({ widget, onRemove, onLocationChange, them
   const [searchLoading, setSearchLoading] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const refreshTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const hasEmittedFeatureFlag = useRef(false)
 
   const refreshInterval = widget.refreshInterval || 10 * 60 * 1000 // Default 10 minutes
+
+  // Emit feature flag on component mount
+  useEffect(() => {
+    if (!hasEmittedFeatureFlag.current) {
+      trackWidgetCreated('weather', widget.id, {
+        location: widget.location,
+        latitude: widget.latitude,
+        longitude: widget.longitude,
+        refresh_interval: refreshInterval
+      })
+      hasEmittedFeatureFlag.current = true
+    }
+  }, [widget.id, widget.location, widget.latitude, widget.longitude, refreshInterval])
+
+  // Track widget removal
+  const handleRemove = () => {
+    trackWidgetRemoved('weather', widget.id, {
+      location: widget.location,
+      had_error: !!error,
+      last_temperature: weatherData?.current?.temperature_2m
+    })
+    onRemove()
+  }
 
   // Weather code to icon/description mapping
   const getWeatherInfo = (code: number, isDay: boolean) => {
@@ -116,9 +141,16 @@ export default function WeatherWidget({ widget, onRemove, onLocationChange, them
       const data: WeatherData = await response.json()
       setWeatherData(data)
       setLastUpdated(new Date())
+      
+      // Track successful weather data load
+      weatherAnalytics.weatherLoaded(widget.id, widget.location || 'Unknown', data.current.temperature_2m)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load weather data")
+      const errorMessage = err instanceof Error ? err.message : "Failed to load weather data"
+      setError(errorMessage)
       console.error("Weather fetch error:", err)
+      
+      // Track weather error
+      weatherAnalytics.weatherError(widget.id, widget.location || 'Unknown', errorMessage)
     } finally {
       setLoading(false)
     }
@@ -159,6 +191,9 @@ export default function WeatherWidget({ widget, onRemove, onLocationChange, them
     const displayName = location.admin1 
       ? `${location.name}, ${location.admin1}, ${location.country}`
       : `${location.name}, ${location.country}`
+    
+    // Track location change
+    weatherAnalytics.locationChanged(widget.id, widget.location || 'Unknown', displayName)
     
     onLocationChange(displayName, location.latitude, location.longitude)
     setIsEditing(false)
@@ -236,7 +271,7 @@ export default function WeatherWidget({ widget, onRemove, onLocationChange, them
           >
             <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} />
           </Button>
-          <Button variant="ghost" size="icon" onClick={onRemove} className="h-6 w-6 rounded-full">
+          <Button variant="ghost" size="icon" onClick={handleRemove} className="h-6 w-6 rounded-full">
             <X className="h-3 w-3" />
           </Button>
         </div>
