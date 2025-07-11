@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import type { Widget } from "../types/widget"
 import videojs from "video.js"
 import "video.js/dist/video-js.css"
+import { trackWidgetCreated, trackWidgetRemoved, streamAnalytics } from "@/lib/analytics"
 
 // Import the HTTP streaming plugin
 import '@videojs/http-streaming'
@@ -37,6 +38,30 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
   const [useDashPlayer, setUseDashPlayer] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const [errorMessage, setErrorMessage] = useState("")
+  const hasEmittedFeatureFlag = useRef(false)
+
+  // Emit feature flag on component mount
+  useEffect(() => {
+    if (!hasEmittedFeatureFlag.current) {
+      trackWidgetCreated('stream', widget.id, {
+        url: widget.url,
+        stream_type: widget.streamType,
+        title: widget.title
+      })
+      hasEmittedFeatureFlag.current = true
+    }
+  }, [widget.id, widget.url, widget.streamType, widget.title])
+
+  // Track widget removal
+  const handleRemove = () => {
+    trackWidgetRemoved('stream', widget.id, {
+      url: widget.url,
+      stream_type: widget.streamType,
+      had_error: hasError,
+      error_message: errorMessage
+    })
+    onRemove()
+  }
 
   const getVideoJSType = (streamType?: string) => {
     switch (streamType) {
@@ -72,6 +97,9 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
           console.error("DASH.js error:", e)
           setUseDashPlayer(false)
           setHasError(true)
+          
+          // Track DASH stream error
+          streamAnalytics.streamError(widget.id, widget.url, `DASH error: ${e.error?.message || 'Unknown error'}`)
         })
         
         dashPlayer.on(dashjs.MediaPlayer.events.STREAM_INITIALIZED, () => {
@@ -79,6 +107,9 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
           setUseDashPlayer(true)
           setIsPlayerReady(true)
           setHasError(false)
+          
+          // Track successful DASH stream load
+          streamAnalytics.streamLoaded(widget.id, widget.url, 'dash')
         })
         
         return () => {
@@ -141,6 +172,9 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
               type: getVideoJSType(widget.streamType),
             })
           }
+          
+          // Track successful player initialization
+          streamAnalytics.streamLoaded(widget.id, widget.url, widget.streamType || 'auto')
         }
       ))
 
@@ -149,21 +183,30 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
         const error = player.error()
         console.error("Video.js player error:", error)
         
+        let errorMsg = "Unknown error"
+        
         // Handle specific error codes
         if (error && error.code === 4) {
-          setErrorMessage("Media format not supported. Trying native player...")
+          errorMsg = "Media format not supported. Trying native player..."
+          setErrorMessage(errorMsg)
           console.log("Media format not supported, trying native player...")
           setUseNativePlayer(true)
         } else if (error && error.code === 2) {
-          setErrorMessage("Network error or CORS issue. The stream may require special headers or proxy.")
+          errorMsg = "Network error or CORS issue. The stream may require special headers or proxy."
+          setErrorMessage(errorMsg)
           setHasError(true)
         } else if (error && error.code === 3) {
-          setErrorMessage("Decoding error. The stream format may be corrupted.")
+          errorMsg = "Decoding error. The stream format may be corrupted."
+          setErrorMessage(errorMsg)
           setHasError(true)
         } else {
-          setErrorMessage("Failed to load stream. Check URL and format.")
+          errorMsg = "Failed to load stream. Check URL and format."
+          setErrorMessage(errorMsg)
           setHasError(true)
         }
+        
+        // Track Video.js error
+        streamAnalytics.streamError(widget.id, widget.url, `Video.js error (${error?.code || 'unknown'}): ${errorMsg}`)
       })
 
       // Handle loading events
@@ -248,7 +291,7 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={openInNewTab} aria-label="Open in new tab">
               <ExternalLink className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleRemove} aria-label="Remove widget">
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -314,7 +357,7 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={openInNewTab} aria-label="Open in new tab">
             <ExternalLink className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleRemove} aria-label="Remove widget">
             <X className="h-4 w-4" />
           </Button>
         </div>

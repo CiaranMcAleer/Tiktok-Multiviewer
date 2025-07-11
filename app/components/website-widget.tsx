@@ -1,26 +1,64 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { X, RefreshCw, ExternalLink, Globe, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { trackWidgetCreated, trackWidgetRemoved, websiteAnalytics } from "@/lib/analytics"
 
 interface WebsiteWidgetProps {
   title: string
   url: string
   onRemove: () => void
   theme: "light" | "dark"
+  widgetId: string
 }
 
-export default function WebsiteWidget({ title, url, onRemove, theme }: WebsiteWidgetProps) {
+export default function WebsiteWidget({ title, url, onRemove, theme, widgetId }: WebsiteWidgetProps) {
   const [embedError, setEmbedError] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const [showWarning, setShowWarning] = useState(true)
+  const hasEmittedFeatureFlag = useRef(false)
+
+  // Emit feature flag on component mount
+  useEffect(() => {
+    if (!hasEmittedFeatureFlag.current) {
+      trackWidgetCreated('website', widgetId, {
+        url: url,
+        title: title
+      })
+      hasEmittedFeatureFlag.current = true
+    }
+  }, [widgetId, url, title])
+
+  // Track widget removal
+  const handleRemove = () => {
+    trackWidgetRemoved('website', widgetId, {
+      url: url,
+      had_embed_error: embedError
+    })
+    onRemove()
+  }
 
   const refreshContent = () => {
     setRefreshKey((prev) => prev + 1)
     setEmbedError(false)
     setShowWarning(false)
+    
+    // Track website refresh
+    websiteAnalytics.urlLoaded(widgetId, url)
+  }
+
+  const handleError = () => {
+    setEmbedError(true)
+    // Track website error
+    websiteAnalytics.urlError(widgetId, url, "iframe_load_error")
+  }
+
+  const handleExternalOpen = () => {
+    window.open(url, "_blank")
+    // Track external URL opening
+    websiteAnalytics.urlLoaded(widgetId, url)
   }
 
   if (embedError) {
@@ -37,10 +75,10 @@ export default function WebsiteWidget({ title, url, onRemove, theme }: WebsiteWi
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={refreshContent}>
               <RefreshCw className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => window.open(url, "_blank")}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleExternalOpen}>
               <ExternalLink className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleRemove}>
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -106,8 +144,12 @@ export default function WebsiteWidget({ title, url, onRemove, theme }: WebsiteWi
           key={refreshKey}
           src={url}
           className="w-full h-full border-0 rounded-b-lg"
-          onError={() => setEmbedError(true)}
-          onLoad={() => setShowWarning(false)}
+          onError={handleError}
+          onLoad={() => {
+            setShowWarning(false)
+            // Track successful URL load
+            websiteAnalytics.urlLoaded(widgetId, url)
+          }}
           sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-top-navigation"
           referrerPolicy="no-referrer-when-downgrade"
         />

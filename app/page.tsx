@@ -42,6 +42,7 @@ import TwitchWidget from "./components/twitch-widget"
 import { ThemeProvider, useTheme } from "./components/theme-provider"
 import type { Widget, LayoutData, WidgetType } from "./types/widget"
 import PopupManager from "./utils/popup-manager"
+import { trackWidgetCreated } from "@/lib/analytics"
 
 function MultiviewerApp() {
   const [widgets, setWidgets] = useState<Widget[]>([])
@@ -324,6 +325,20 @@ function MultiviewerApp() {
     setWidgets([...widgets, newWidget])
     setInputUrl("")
     setInputTitle("")
+    
+    // Track widget creation for analytics
+    trackWidgetCreated(type, newWidget.id, {
+      title: newWidget.title,
+      url: newWidget.url,
+      stream_type: newWidget.streamType,
+      timezone: newWidget.timezone,
+      city: newWidget.city,
+      location: newWidget.location,
+      latitude: newWidget.latitude,
+      longitude: newWidget.longitude,
+      refresh_interval: newWidget.refreshInterval,
+      twitch_channel: newWidget.twitchChannel
+    })
   }
 
   const addWebsiteWidget = () => {
@@ -353,6 +368,12 @@ function MultiviewerApp() {
     setWebsiteUrl("")
     setWebsiteTitle("")
     setIsWebsiteDialogOpen(false)
+    
+    // Track widget creation for analytics
+    trackWidgetCreated('website', newWidget.id, {
+      title: newWidget.title,
+      url: newWidget.url
+    })
   }
 
   const addNotesWidget = () => {
@@ -372,6 +393,11 @@ function MultiviewerApp() {
     setWidgets([...widgets, newWidget])
     setNotesTitle("")
     setIsNotesDialogOpen(false)
+    
+    // Track widget creation for analytics
+    trackWidgetCreated('notes', newWidget.id, {
+      title: newWidget.title
+    })
   }
 
   const addRSSWidget = () => {
@@ -402,6 +428,14 @@ function MultiviewerApp() {
     setRssTitle("")
     setRssRefreshInterval(5) // Reset to default
     setIsRSSDialogOpen(false)
+    
+    // Track widget creation for analytics
+    trackWidgetCreated('rss', newWidget.id, {
+      title: newWidget.title,
+      feed_url: newWidget.feedUrl,
+      refresh_interval: newWidget.refreshInterval,
+      max_items: newWidget.maxItems
+    })
   }
 
   const addWeatherWidget = () => {
@@ -429,6 +463,14 @@ function MultiviewerApp() {
     setWeatherLatitude(null)
     setWeatherLongitude(null)
     setIsWeatherDialogOpen(false)
+    
+    // Track widget creation for analytics
+    trackWidgetCreated('weather', newWidget.id, {
+      title: newWidget.title,
+      location: newWidget.location,
+      latitude: newWidget.latitude,
+      longitude: newWidget.longitude
+    })
   }
 
   const updateWorldTimeWidget = (id: string, city: string, timezone: string) => {
@@ -1060,6 +1102,7 @@ function MultiviewerApp() {
                     url={widget.url}
                     onRemove={() => removeWidget(widget.id)}
                     theme={theme}
+                    widgetId={widget.id}
                   />
                 ) : widget.type === "notes" ? (
                   <NotesWidget

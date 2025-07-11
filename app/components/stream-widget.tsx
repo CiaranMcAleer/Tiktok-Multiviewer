@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import type { Widget } from "../types/widget"
 import PopupManager from "../utils/popup-manager"
+import { trackWidgetCreated, trackWidgetRemoved, streamAnalytics } from "@/lib/analytics"
 
 interface StreamWidgetProps {
   widget: Widget
@@ -21,6 +22,35 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
   const popupManager = useRef<PopupManager>(PopupManager.getInstance())
   const refreshTimerRef = useRef<NodeJS.Timeout | null>(null)
   const iframelyLoadedRef = useRef(false)
+  const hasEmittedFeatureFlag = useRef(false)
+
+  // Emit feature flag on component mount
+  useEffect(() => {
+    if (!hasEmittedFeatureFlag.current) {
+      trackWidgetCreated(widget.type as any, widget.id, {
+        url: widget.url,
+        stream_type: widget.streamType,
+        refresh_interval: widget.refreshInterval
+      })
+      hasEmittedFeatureFlag.current = true
+    }
+  }, [widget.id, widget.type, widget.url, widget.streamType, widget.refreshInterval])
+
+  // Track widget removal
+  const handleRemove = () => {
+    trackWidgetRemoved(widget.type as any, widget.id, {
+      url: widget.url,
+      had_embed_error: embedError,
+      was_active: isActive
+    })
+    onRemove()
+  }
+
+  // Handle and track errors
+  const handleError = (errorType: string) => {
+    setEmbedError(true)
+    streamAnalytics.streamError(widget.id, widget.url, errorType)
+  }
 
   // Check if popup is still open
   useEffect(() => {
@@ -145,6 +175,9 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
 
     popupManager.current.openPopup(widget.id, url, widget.title, widget.type)
     setIsActive(true)
+    
+    // Track stream loading
+    streamAnalytics.streamLoaded(widget.id, widget.url, widget.streamType || widget.type)
   }
 
   const refreshContent = () => {
@@ -181,7 +214,7 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
             className="w-full h-full border-0 rounded-md"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            onError={() => setEmbedError(true)}
+            onError={() => handleError("youtube_embed_error")}
           />
         )
       }
@@ -196,7 +229,7 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
               src={`${trafficImageUrl}?cache=${lastRefresh}`}
               alt={widget.title}
               className="max-w-full max-h-full object-contain rounded-md"
-              onError={() => setEmbedError(true)}
+              onError={() => handleError("traffic_image_error")}
             />
             <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
               Live • Refreshes every 5s
@@ -213,7 +246,7 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
               src={`${widget.url}${widget.url.includes("?") ? "&" : "?"}t=${lastRefresh}`}
               alt={widget.title}
               className="w-full h-full object-contain rounded-md"
-              onError={() => setEmbedError(true)}
+              onError={() => handleError("traffic_cam_error")}
             />
             <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
               Refreshes every 20s
@@ -227,7 +260,7 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
         <iframe
           src={widget.url}
           className="w-full h-full border-0 rounded-md"
-          onError={() => setEmbedError(true)}
+          onError={() => handleError("iframe_error")}
           key={lastRefresh}
         />
       )
@@ -287,7 +320,7 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => window.open(widget.url, "_blank")} aria-label="Open in new tab">
               <ExternalLink className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleRemove} aria-label="Remove widget">
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -336,7 +369,7 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={openPopupWindow} aria-label="Open in popup">
             <Maximize2 className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleRemove} aria-label="Remove widget">
             <X className="h-4 w-4" />
           </Button>
         </div>
