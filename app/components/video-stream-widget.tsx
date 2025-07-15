@@ -103,6 +103,8 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
       videoElement.setAttribute("crossorigin", "anonymous")
       videoElement.style.width = "100%"
       videoElement.style.height = "100%"
+      videoElement.style.maxHeight = "320px"
+      videoElement.style.objectFit = "contain"
       
       videoRef.current.appendChild(videoElement)
 
@@ -112,7 +114,7 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
         {
           controls: true,
           responsive: true,
-          fluid: true,
+          fluid: false,
           autoplay: false,
           preload: "metadata",
           liveui: true,
@@ -328,8 +330,8 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
             autoPlay={false}
             muted
             crossOrigin="anonymous"
-            className="w-full h-full bg-black rounded-b-lg"
-            style={{ minHeight: "320px" }}
+            className="w-full h-full bg-black rounded-b-lg object-contain"
+            style={{ minHeight: "320px", maxHeight: "320px" }}
             onError={() => setHasError(true)}
             onLoadStart={() => setHasError(false)}
           />
@@ -340,8 +342,8 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
             autoPlay={false}
             muted
             crossOrigin="anonymous"
-            className="w-full h-full bg-black rounded-b-lg"
-            style={{ minHeight: "320px" }}
+            className="w-full h-full bg-black rounded-b-lg object-contain"
+            style={{ minHeight: "320px", maxHeight: "320px" }}
             onError={(e) => {
               const target = e.target as HTMLVideoElement
               const error = target.error
@@ -375,8 +377,8 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
         ) : (
           <div
             ref={videoRef}
-            className="w-full h-full bg-black rounded-b-lg"
-            style={{ minHeight: "320px" }}
+            className="w-full h-full bg-black rounded-b-lg overflow-hidden"
+            style={{ minHeight: "320px", maxHeight: "320px" }}
           />
         )}
       </CardContent>
