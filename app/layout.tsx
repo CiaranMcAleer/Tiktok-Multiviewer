@@ -1,24 +1,39 @@
+
 import type { Metadata } from 'next'
 import './globals.css'
-import { Analytics } from "@vercel/analytics/next" // vercel analytics
-import { SpeedInsights } from "@vercel/speed-insights/next" // vercel speed insights
+import { Analytics } from "@vercel/analytics/next"
+import { SpeedInsights } from "@vercel/speed-insights/next"
+
 
 export const metadata: Metadata = {
   title: 'TikTok Multiviewer',
   description: 'A multi-source livestream and widget dashboard for TikTok, YouTube, Twitch, and more. Developed by Ciaran McAleer.',
   generator: 'Ciaran McAleer',
-}
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+};
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning={true}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme');
+                  if (theme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                  } else {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body>
         {children}
-        <footer className="w-full border-t mt-8 py-4 bg-white text-center text-gray-600 flex flex-col items-center gap-2 dark:bg-gray-900 dark:text-gray-400">
+        <footer className="w-full border-t mt-8 py-4 bg-background text-center text-foreground flex flex-col items-center gap-2">
           <a
             href="https://github.com/CiaranMcAleer/Tiktok-Multiviewer"
             target="_blank"
@@ -38,5 +53,5 @@ export default function RootLayout({
         <SpeedInsights />
       </body>
     </html>
-  )
+  );
 }

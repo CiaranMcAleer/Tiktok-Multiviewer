@@ -17,7 +17,14 @@ export default function MapWidget({ title, onRemove, theme }: MapWidgetProps) {
   const [locationError, setLocationError] = useState<string | null>(null)
   const [userLocation, setUserLocation] = useState<[number, number] | null>(null)
 
-  const mapLayers = {
+  type MapLayer = {
+    name: string
+    url: string
+    attribution: string
+    maxZoom?: number
+  }
+
+  const mapLayers: Record<string, MapLayer> = {
     osm: {
       name: "OpenStreetMap",
       url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -185,12 +192,12 @@ export default function MapWidget({ title, onRemove, theme }: MapWidgetProps) {
       />
 
       <Card
-        className={`relative h-96 ${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
+        className="relative h-96 bg-background border-border"
       >
-        <CardHeader className="flex flex-row items-center justify-between p-3">
+        <CardHeader className="flex flex-row items-center justify-between p-3 bg-background">
           <div className="flex items-center gap-2 min-w-0">
             <Layers className="h-4 w-4" />
-            <span className="font-medium truncate">{title}</span>
+            <span className="font-medium truncate text-foreground">{title}</span>
             {locationError && (
               <span className="text-xs text-yellow-500" title={locationError}>
                 (Fallback)
@@ -201,14 +208,14 @@ export default function MapWidget({ title, onRemove, theme }: MapWidgetProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8"
+              className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
               onClick={centerOnUserLocation}
               title="Center on current location"
               aria-label="Center map on current location"
             >
               <MapPin className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
+            <Button variant="ghost" size="icon" className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground" onClick={onRemove} aria-label="Remove widget">
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -216,9 +223,9 @@ export default function MapWidget({ title, onRemove, theme }: MapWidgetProps) {
 
         <CardContent className="p-0 h-80 relative">
           {isLoading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-700 z-10">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
-              <span className="ml-2 text-sm">{userLocation ? "Loading map..." : "Getting your location..."}</span>
+            <div className="absolute inset-0 flex items-center justify-center bg-muted z-10">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+              <span className="ml-2 text-sm text-muted-foreground">{userLocation ? "Loading map..." : "Getting your location..."}</span>
             </div>
           )}
           <div id={`map-${title}`} className="w-full h-full rounded-b-lg" style={{ minHeight: "320px" }} />

@@ -394,18 +394,18 @@ export default function WorldTimeWidget({
   }
 
   return (
-    <Card className={`relative h-96 ${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
+    <Card className="relative h-96 bg-background border-border">
       <CardHeader className="flex flex-row items-center justify-between p-3">
         <div className="flex items-center gap-2 min-w-0">
           <Clock className="h-4 w-4" />
-          <span className={`font-medium truncate ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{title}</span>
+          <span className="font-medium truncate text-foreground">{title}</span>
           {error && (
             <span className="text-xs text-yellow-500" title={error}>
               (Browser)
             </span>
           )}
         </div>
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
+        <Button variant="ghost" size="icon" className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground" onClick={onRemove} aria-label="Remove widget">
           <X className="h-4 w-4" />
         </Button>
       </CardHeader>
@@ -415,7 +415,7 @@ export default function WorldTimeWidget({
           <div className="mb-4">
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" role="combobox" aria-expanded={open} className="w-64 justify-between">
+                <Button variant="outline" role="combobox" aria-expanded={open} className="w-64 justify-between bg-background text-foreground hover:bg-accent hover:text-accent-foreground">
                   <div className="flex items-center gap-2">
                     <MapPin className="h-3 w-3" />
                     <span className="truncate">{city}</span>
@@ -456,16 +456,16 @@ export default function WorldTimeWidget({
             ) : (
               <>
                 <div
-                  className={`text-4xl font-mono font-bold mb-2 ${theme === "dark" ? "text-white" : "text-gray-900"}`}
+                  className="text-4xl font-mono font-bold mb-2 text-foreground"
                 >
                   {currentTime}
                 </div>
-                <div className={`text-lg mb-1 ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+                <div className="text-lg mb-1 text-muted-foreground">
                   {currentDate}
                 </div>
-                <div className={`text-sm mb-1 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>{timezone}</div>
+                <div className="text-sm mb-1 text-muted-foreground">{timezone}</div>
                 {timeData && (
-                  <div className={`text-xs ${theme === "dark" ? "text-gray-500" : "text-gray-400"}`}>
+                  <div className="text-xs text-muted-foreground">
                     {timeData.abbreviation} • UTC{timeData.utc_offset}
                     {timeData.dst && " • DST"}
                     {useApiFallback && " • Browser timezone"}

@@ -43,11 +43,11 @@ export default function NotesWidget({ title, content, onRemove, onContentChange,
   }
 
   return (
-    <Card className={`relative h-96 ${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}>
-      <CardHeader className="flex flex-row items-center justify-between p-3">
+    <Card className="relative h-96 bg-background border-border">
+      <CardHeader className="flex flex-row items-center justify-between p-3 bg-background">
         <div className="flex items-center gap-2 min-w-0">
           <FileText className="h-4 w-4" />
-          <span className={`font-medium truncate ${theme === "dark" ? "text-white" : "text-gray-900"}`}>{title}</span>
+          <span className="font-medium truncate text-foreground">{title}</span>
           {hasUnsavedChanges && (
             <span className="text-xs text-orange-500" title="Unsaved changes">
               •
@@ -56,11 +56,11 @@ export default function NotesWidget({ title, content, onRemove, onContentChange,
         </div>
         <div className="flex gap-1">
           {hasUnsavedChanges && (
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={saveContent} title="Save (Ctrl+S)" aria-label="Save notes">
+            <Button variant="ghost" size="icon" className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground" onClick={saveContent} title="Save (Ctrl+S)" aria-label="Save notes">
               <Save className="h-4 w-4" />
             </Button>
           )}
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
+          <Button variant="ghost" size="icon" className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground" onClick={onRemove} aria-label="Remove widget">
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -72,11 +72,7 @@ export default function NotesWidget({ title, content, onRemove, onContentChange,
           onChange={(e) => handleContentChange(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Enter your notes here... (Ctrl+S to save)"
-          className={`w-full h-full resize-none border-0 focus:ring-0 focus:border-0 ${
-            theme === "dark"
-              ? "bg-gray-800 text-white placeholder-gray-400"
-              : "bg-white text-gray-900 placeholder-gray-500"
-          }`}
+          className="w-full h-full resize-none border-0 focus:ring-0 focus:border-0 bg-background text-foreground placeholder-muted-foreground"
           style={{ outline: "none", boxShadow: "none" }}
         />
         {hasUnsavedChanges && (

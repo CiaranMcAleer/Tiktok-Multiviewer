@@ -11,8 +11,33 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
+
+import { useEffect } from "react"
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light")
+  // Get initial theme from localStorage or <html> class
+  const getInitialTheme = (): Theme => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("theme") as Theme | null
+      if (stored === "light" || stored === "dark") return stored
+      // Fallback: check <html> class
+      if (document.documentElement.classList.contains("dark")) return "dark"
+    }
+    return "dark" // default
+  }
+
+  const [theme, setTheme] = useState<Theme>(getInitialTheme)
+
+  // Sync theme to <html> class and localStorage
+  useEffect(() => {
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark")
+      localStorage.setItem("theme", "dark")
+    } else {
+      document.documentElement.classList.remove("dark")
+      localStorage.setItem("theme", "light")
+    }
+  }, [theme])
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"))

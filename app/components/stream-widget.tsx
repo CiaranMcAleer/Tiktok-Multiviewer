@@ -88,9 +88,7 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
 
   return (
     <Card
-      className={`relative h-96 ${isActive ? "ring-2 ring-green-500" : ""} ${
-        theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
-      }`}
+      className={`relative h-96 ${isActive ? "ring-2 ring-green-500" : ""} bg-background border-border`}
     >
       <CardHeader className="flex flex-row items-center justify-between p-3">
         <div className="flex items-center gap-2 min-w-0">
@@ -105,19 +103,19 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
                     : "bg-gray-400"
             }`}
           />
-          <span className="font-medium truncate">{widget.title}</span>
+          <span className="font-medium truncate text-foreground">{widget.title}</span>
         </div>
         <div className="flex gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleRefresh} aria-label="Refresh content">
+          <Button variant="ghost" size="icon" className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground" onClick={handleRefresh} aria-label="Refresh content">
             <RefreshCw className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => window.open(widget.url, "_blank")} aria-label="Open in new tab">
+          <Button variant="ghost" size="icon" className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground" onClick={() => window.open(widget.url, "_blank")} aria-label="Open in new tab">
             <ExternalLink className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={openPopupWindow} aria-label="Open in popup">
+          <Button variant="ghost" size="icon" className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground" onClick={openPopupWindow} aria-label="Open in popup">
             <Maximize2 className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
+          <Button variant="ghost" size="icon" className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground" onClick={onRemove} aria-label="Remove widget">
             <X className="h-4 w-4" />
           </Button>
         </div>

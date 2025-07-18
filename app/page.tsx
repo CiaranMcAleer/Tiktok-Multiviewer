@@ -733,7 +733,9 @@ function MultiviewerApp() {
               onClick={() => addWidget("map")}
               disabled={widgets.length >= 10}
               variant="outline"
-              className={theme === "dark" ? "text-white border-gray-600 bg-gray-800 hover:bg-gray-700" : ""}
+              className={theme === "dark"
+                ? "text-white border-gray-600 bg-gray-800 hover:bg-gray-700"
+                : "text-white bg-black hover:bg-gray-900 border-black"}
             >
               <Map className="h-4 w-4 mr-2" />
               Add Map
@@ -1107,7 +1109,6 @@ function MultiviewerApp() {
                   <VideoStreamWidget
                     widget={widget}
                     onRemove={() => removeWidget(widget.id)}
-                    theme={theme}
                   />
                 ) : widget.type === "rss" ? (
                   <RSSWidget

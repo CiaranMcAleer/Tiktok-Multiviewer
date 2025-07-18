@@ -15,7 +15,7 @@ import '@videojs/http-streaming'
 let dashjs: any = null
 if (typeof window !== 'undefined') {
   import('dashjs').then((dash) => {
-    dashjs = dash.default || dash
+    dashjs = dash
     console.log('DASH.js loaded')
   })
 }
@@ -23,10 +23,9 @@ if (typeof window !== 'undefined') {
 interface VideoStreamWidgetProps {
   widget: Widget
   onRemove: () => void
-  theme: "light" | "dark"
 }
 
-export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStreamWidgetProps) {
+export default function VideoStreamWidget({ widget, onRemove }: VideoStreamWidgetProps) {
   const videoRef = useRef<HTMLDivElement>(null)
   const nativeVideoRef = useRef<HTMLVideoElement>(null)
   const playerRef = useRef<any>(null)
@@ -147,7 +146,7 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
       ))
 
       // Better error handling
-      player.on("error", (e) => {
+      player.on("error", (e: unknown) => {
         const error = player.error()
         console.error("Video.js player error:", error)
         
@@ -235,22 +234,20 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
 
   if (hasError) {
     return (
-      <Card
-        className={`relative h-96 ${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
-      >
+      <Card className="relative h-96 bg-background border border-border">
         <CardHeader className="flex flex-row items-center justify-between p-3">
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-2 h-2 rounded-full bg-red-500" />
-            <span className="font-medium truncate">{widget.title}</span>
+            <span className="font-medium truncate text-foreground">{widget.title}</span>
           </div>
           <div className="flex gap-1">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={refreshStream} aria-label="Refresh stream">
+            <Button variant="ghost" size="icon" className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground" onClick={refreshStream} aria-label="Refresh stream">
               <RefreshCw className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={openInNewTab} aria-label="Open in new tab">
+            <Button variant="ghost" size="icon" className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground" onClick={openInNewTab} aria-label="Open in new tab">
               <ExternalLink className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
+            <Button variant="ghost" size="icon" className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground" onClick={onRemove} aria-label="Remove widget">
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -260,21 +257,21 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
             <Play className="h-12 w-12 mx-auto mb-4 text-gray-400" />
             <p className="text-red-500 mb-2">Failed to load stream</p>
             {errorMessage && (
-              <p className="text-sm text-red-600 dark:text-red-400 mb-2 font-mono">
+            <p className="text-sm text-red-600 mb-2 font-mono">  {/* Use text-red-600 for both themes, or use text-destructive if you want theme-aware */}
                 {errorMessage}
               </p>
             )}
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               The stream may be offline, the URL format is not supported, or CORS headers are blocking playback
             </p>
-            <div className="text-xs text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded mb-4">
+            <div className="text-xs text-yellow-600 bg-yellow-50 p-2 rounded mb-4 dark:text-yellow-400 dark:bg-yellow-900/20">
               <strong>Common issues:</strong><br/>
               • CORS headers blocking cross-origin requests<br/>
               • Stream requires authentication or special headers<br/>
               • URL may not be a direct stream link<br/>
               • Stream may be offline or geo-restricted
             </div>
-            <div className="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded mb-4">
+            <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded mb-4 dark:text-blue-400 dark:bg-blue-900/20">
               <strong>Test streams to try:</strong><br/>
               <code className="text-xs">https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8</code><br/>
               <code className="text-xs">https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8</code>
@@ -296,13 +293,11 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
   }
 
   return (
-    <Card
-      className={`relative h-96 ${theme === "dark" ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"}`}
-    >
+    <Card className="relative h-96 bg-background border border-border">
       <CardHeader className="flex flex-row items-center justify-between p-3">
         <div className="flex items-center gap-2 min-w-0">
           <div className="w-2 h-2 rounded-full bg-green-500" />
-          <span className="font-medium truncate">{widget.title}</span>
+          <span className="font-medium truncate text-foreground">{widget.title}</span>
           {widget.streamType && (
             <span className="text-xs bg-blue-500 text-white px-2 py-1 rounded uppercase">
               {widget.streamType} {useDashPlayer ? "(DASH.js)" : useNativePlayer ? "(Native)" : "(Video.js)"}
@@ -310,13 +305,13 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
           )}
         </div>
         <div className="flex gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={refreshStream} aria-label="Refresh stream">
+          <Button variant="ghost" size="icon" className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground" onClick={refreshStream} aria-label="Refresh stream">
             <RefreshCw className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={openInNewTab} aria-label="Open in new tab">
+          <Button variant="ghost" size="icon" className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground" onClick={openInNewTab} aria-label="Open in new tab">
             <ExternalLink className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onRemove} aria-label="Remove widget">
+          <Button variant="ghost" size="icon" className="h-8 w-8 bg-background text-foreground hover:bg-accent hover:text-accent-foreground" onClick={onRemove} aria-label="Remove widget">
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -330,7 +325,7 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
             autoPlay={false}
             muted
             crossOrigin="anonymous"
-            className="w-full h-full bg-black rounded-b-lg object-contain"
+            className="w-full h-full bg-background rounded-b-lg object-contain"
             style={{ minHeight: "320px", maxHeight: "320px" }}
             onError={() => setHasError(true)}
             onLoadStart={() => setHasError(false)}
@@ -342,7 +337,7 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
             autoPlay={false}
             muted
             crossOrigin="anonymous"
-            className="w-full h-full bg-black rounded-b-lg object-contain"
+            className="w-full h-full bg-background rounded-b-lg object-contain"
             style={{ minHeight: "320px", maxHeight: "320px" }}
             onError={(e) => {
               const target = e.target as HTMLVideoElement
@@ -377,7 +372,7 @@ export default function VideoStreamWidget({ widget, onRemove, theme }: VideoStre
         ) : (
           <div
             ref={videoRef}
-            className="w-full h-full bg-black rounded-b-lg overflow-hidden"
+            className="w-full h-full bg-background rounded-b-lg overflow-hidden"
             style={{ minHeight: "320px", maxHeight: "320px" }}
           />
         )}
