@@ -7,23 +7,14 @@
 
 ---
 
-**Multiviewer grid for TikTok Live, YouTube, traffic cameras, websites, and more!**
+**Multiviewer grid webapp for TikTok Live, YouTube, TrafficWatchNI cameras, websites, and more!**
 
 ---
 
-Next.js-based multiviewer grid for TikTok Live. Also supports YouTube, TrafficWatch NI, website embeds, world clocks, maps, and notes. Modular and extendable.
+Next.js-based multiviewer grid webapp for TikTok Live. Modular and extendable to enable widgets for new providers to be easily added. The web-app features a sharing function where b64 can be used to encode a config into the link and share with others, enabling watchparty experiences.
+
 
 ![image](https://github.com/user-attachments/assets/47f504b1-6724-4d8b-93fa-cbd735c89919)
-
-## 🚀 Features
-
-- **Multi-platform:** Watch TikTok Live, YouTube, traffic cameras, and more in a single grid.
-- **Drag & Drop:** Arrange widgets freely with a modern drag-and-drop interface.
-- **Modular Widgets:** Add maps, world clocks, notes, and website embeds.
-- **Share Layouts:** Share your custom grid with a single base64-encoded link.
-- **Persistent:** Layouts and notes are saved and can be shared or restored.
-- **Dark/Light Theme:** Beautiful, responsive UI with theme toggle.
-- **Easy to Extend:** Add your own widgets with minimal code.
 
 > **Note:** Due to platform limitations, TikTok Live links must be opened in a popup window.
 
@@ -32,10 +23,13 @@ Next.js-based multiviewer grid for TikTok Live. Also supports YouTube, TrafficWa
 ## 🧩 Widget Types
 - **TikTok Live** (popup)
 - **YouTube**
+- **Twitch**
 - **TrafficWatch NI** (auto-refreshing)
 - **Website Embeds**
 - **World Time Clocks**
-- **Maps** (with geolocation)
+- **Leaflet JS Maps** (with geolocation)
+- **RSS Feeds**
+- **Weather**
 - **Notes**
 
 ## ✨ How to Use
@@ -54,7 +48,7 @@ Next.js-based multiviewer grid for TikTok Live. Also supports YouTube, TrafficWa
 
 ### Layout Management
 1. **Arrange:** Drag and drop widgets to organize your grid
-2. **Share:** Click 'Share' to get a link to your current layout
+2. **Share:** Click 'Share' to get a link to your current layout(Link contains b64 encoding of your config)
 3. **Restore:** Paste a shared layout link to restore a grid
 
 ## 🛠️ Local Development
@@ -67,14 +61,6 @@ Visit [http://localhost:3000](http://localhost:3000) in your browser.
 ## ☁️ Deploy
 - **Vercel:** Click the Deploy button above or run `vercel` in your project directory.
 - **Netlify:** Configure as a Next.js app, or use your preferred static host.
-
-## 📚 Documentation
-
-- **[Documentation Index](docs/README.md)** - Complete documentation overview and navigation
-- **[Technical Documentation](docs/TECHNICAL.md)** - Architecture, components, and implementation details
-- **[Username Disambiguation](docs/USERNAME_DISAMBIGUATION.md)** - How the input system works
-- **[Testing Guide](docs/TESTING.md)** - Testing setup, running tests, and contributing
-- **[Changelog](docs/CHANGELOG.md)** - Version history and recent improvements
 
 ## 📄 License
 MIT — Ciaran McAleer
