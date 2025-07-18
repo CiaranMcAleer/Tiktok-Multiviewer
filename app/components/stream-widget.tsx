@@ -199,7 +199,7 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
               onError={() => setEmbedError(true)}
             />
             <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-              Live • Refreshes every 5s
+              Live • Refreshes every {widget.refreshInterval ? Math.round(widget.refreshInterval / 1000) : 20}s
             </div>
           </div>
         )
@@ -216,7 +216,7 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
               onError={() => setEmbedError(true)}
             />
             <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
-              Refreshes every 20s
+              Refreshes every {widget.refreshInterval ? Math.round(widget.refreshInterval / 1000) : 20}s
             </div>
           </div>
         )

@@ -31,6 +31,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import StreamWidget from "./components/stream-widget"
 import VideoStreamWidget from "./components/video-stream-widget"
+import TwniCameraSelector from "./components/twni-camera-selector"
+import TwniWidget from "./components/twni-widget"
 import MapWidget from "./components/map-widget"
 import WorldTimeWidget from "./components/world-time-widget"
 import WebsiteWidget from "./components/website-widget"
@@ -44,6 +46,25 @@ import type { Widget, LayoutData, WidgetType } from "./types/widget"
 import PopupManager from "./utils/popup-manager"
 
 function MultiviewerApp() {
+  // Handler for adding a TWNI camera from the selector overlay
+  const handleAddTwniCamera = (
+    camera: { id: number; name: string; region: string; url: string },
+    refreshInterval: number
+  ) => {
+    setWidgets((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        type: "trafficcam",
+        url: camera.url,
+        title: camera.name,
+        refreshInterval: refreshInterval * 1000,
+        cameraId: camera.id,
+        cameraRegion: camera.region,
+      },
+    ])
+    setIsTwniDialogOpen(false)
+  }
   const [widgets, setWidgets] = useState<Widget[]>([])
   const [inputUrl, setInputUrl] = useState("")
   const [inputTitle, setInputTitle] = useState("")
@@ -55,6 +76,7 @@ function MultiviewerApp() {
   const [isNotesDialogOpen, setIsNotesDialogOpen] = useState(false)
   const [isRSSDialogOpen, setIsRSSDialogOpen] = useState(false)
   const [isWeatherDialogOpen, setIsWeatherDialogOpen] = useState(false)
+  const [isTwniDialogOpen, setIsTwniDialogOpen] = useState(false)
   const [loadCode, setLoadCode] = useState("")
   const [websiteUrl, setWebsiteUrl] = useState("")
   const [websiteTitle, setWebsiteTitle] = useState("")
@@ -171,6 +193,14 @@ function MultiviewerApp() {
     let title = inputTitle.trim()
     let type: WidgetType = forceType || "trafficcam" // Default to traffic cam if no URL and no forced type
     let streamType: "hls" | "dash" | "mp4" | undefined = undefined
+    let cameraId: number | undefined = undefined
+    let cameraRegion: string | undefined = undefined
+
+    // Only show the TWNI popup if explicitly triggered from the dropdown
+    if (!url && forceType === "trafficcam") {
+      setIsTwniDialogOpen(true)
+      return
+    }
 
     // If forced type is map, create map regardless of URL
     if (forceType === "map") {
@@ -202,8 +232,6 @@ function MultiviewerApp() {
       if (url.includes("twitch.tv") || url.includes("twitch.com")) {
         type = "twitch"
         let channelName = url
-        
-        // Extract channel name from Twitch URL formats
         const match = url.match(/twitch\.(?:tv|com)\/([a-zA-Z0-9_]{4,25})/)
         if (match) {
           channelName = match[1]
@@ -211,18 +239,15 @@ function MultiviewerApp() {
           alert("Please enter a valid Twitch channel URL")
           return
         }
-        
         url = `https://twitch.tv/${channelName}`
         title = title || `twitch.tv/${channelName}`
       } else if (url.startsWith("twitch:") || url.startsWith("tw:")) {
-        // Handle explicit Twitch prefixes: "twitch:username" or "tw:username"
         type = "twitch"
         const channelName = url.replace(/^(twitch:|tw:)/, "").replace(/^@?/, "")
         if (!/^[a-zA-Z0-9_]{4,25}$/.test(channelName)) {
           alert("Invalid Twitch channel name. Use 4-25 characters (letters, numbers, underscore)")
           return
         }
-        
         url = `https://twitch.tv/${channelName}`
         title = title || `twitch.tv/${channelName}`
       } else if (url.includes("tiktok.com") || url.includes("@") || extractTikTokUsername(url)) {
@@ -245,14 +270,12 @@ function MultiviewerApp() {
         }
         title = title || "YouTube Video"
       } else if (url.startsWith("yt:") || url.startsWith("youtube:")) {
-        // Handle explicit YouTube prefixes: "yt:channel" or "youtube:channel"
         type = "youtube"
         const channelName = url.replace(/^(yt:|youtube:)/, "").replace(/^@?/, "")
         url = `https://www.youtube.com/@${channelName}`
         title = title || `YouTube: ${channelName}`
       } else if (url.includes(".m3u8") || url.includes(".mpd") || url.includes("hls") || url.includes("dash") || url.includes("stream")) {
         type = "stream"
-        // Detect stream type based on URL
         if (url.includes(".m3u8") || url.includes("hls")) {
           streamType = "hls"
         } else if (url.includes(".mpd") || url.includes("dash")) {
@@ -260,17 +283,26 @@ function MultiviewerApp() {
         } else if (url.includes(".mp4")) {
           streamType = "mp4"
         } else {
-          streamType = "hls" // default
+          streamType = "hls"
         }
         title = title || `${streamType.toUpperCase()} Stream`
       } else if (url.includes(".xml") || url.includes(".rss") || url.includes("rss") || url.includes("feed") || url.includes("atom")) {
         type = "rss"
         title = title || "RSS Feed"
-      } else if (url.includes("trafficwatchni.com") || url.includes("traffic")) {
+      } else if (url.includes("trafficwatchni.com")) {
+        type = "trafficcam"
+        // Try to extract cameraId from the URL
+        const idMatch = url.match(/[?&]id=(\d+)/)
+        if (idMatch) {
+          cameraId = parseInt(idMatch[1], 10)
+        }
+        // Try to extract region from known cameras (if available)
+        // (Optional: could use a lookup table if you have one)
+        title = title || `Traffic Camera${cameraId ? ' #' + cameraId : ''}`
+      } else if (url.includes("traffic")) {
         type = "trafficcam"
         title = title || "Traffic Camera"
       } else if (/^[a-zA-Z0-9_]{4,25}$/.test(url.replace(/^@?/, ""))) {
-        // Handle ambiguous usernames - show options to user
         const cleanUsername = url.replace(/^@?/, "")
         const confirmed = confirm(
           `"${cleanUsername}" could be a username for multiple services.\n\n` +
@@ -280,9 +312,7 @@ function MultiviewerApp() {
           `• tw:${cleanUsername} for Twitch\n` +
           `• yt:${cleanUsername} for YouTube`
         )
-        
         if (confirmed) {
-          // Default to TikTok for @username pattern
           type = "tiktok"
           url = `https://www.tiktok.com/@${cleanUsername}/live`
           title = title || cleanUsername
@@ -297,7 +327,6 @@ function MultiviewerApp() {
           return
         }
       } else {
-        // If URL doesn't match known patterns, treat as traffic cam
         type = "trafficcam"
         title = title || "Camera Feed"
       }
@@ -311,7 +340,7 @@ function MultiviewerApp() {
       type,
       url,
       title,
-      refreshInterval: type === "trafficcam" ? 20000 : type === "rss" ? 5 * 60 * 1000 : undefined, // 20 seconds for traffic cam, 5 minutes for RSS
+      refreshInterval: type === "trafficcam" ? 20000 : type === "rss" ? 5 * 60 * 1000 : undefined,
       city: type === "worldtime" ? "Belfast" : undefined,
       timezone: type === "worldtime" ? "Europe/London" : undefined,
       content: type === "notes" ? "" : undefined,
@@ -319,6 +348,8 @@ function MultiviewerApp() {
       feedUrl: type === "rss" ? url : undefined,
       maxItems: type === "rss" ? 10 : undefined,
       twitchChannel: type === "twitch" ? url.split('/').pop() : undefined,
+      cameraId: type === "trafficcam" ? cameraId : undefined,
+      cameraRegion: type === "trafficcam" ? cameraRegion : undefined,
     }
 
     setWidgets([...widgets, newWidget])
@@ -643,7 +674,7 @@ function MultiviewerApp() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => addWidget("worldtime")}>
+                  <DropdownMenuItem onClick={() => addWidget("worldtime")}> 
                     <Clock className="h-4 w-4 mr-2" />
                     World Time
                   </DropdownMenuItem>
@@ -662,6 +693,10 @@ function MultiviewerApp() {
                   <DropdownMenuItem onClick={() => setIsWeatherDialogOpen(true)}>
                     <CloudSun className="h-4 w-4 mr-2" />
                     Weather
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setIsTwniDialogOpen(true)}>
+                    <Camera className="h-4 w-4 mr-2" />
+                    TrafficWatchNI Camera
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -1085,7 +1120,6 @@ function MultiviewerApp() {
                     widget={widget}
                     onRemove={() => removeWidget(widget.id)}
                     onLocationChange={(location, latitude, longitude) => {
-                      // Update widget location/coords
                       setWidgets((prev) => prev.map((w) =>
                         w.id === widget.id ? { ...w, location, latitude, longitude } : w
                       ))
@@ -1099,9 +1133,18 @@ function MultiviewerApp() {
                     onChannelChange={(channel) => updateTwitchWidget(widget.id, channel)}
                     theme={theme}
                   />
+                ) : widget.type === "trafficcam" ? (
+                  <StreamWidget widget={widget} onRemove={() => removeWidget(widget.id)} theme={theme} />
                 ) : (
                   <StreamWidget widget={widget} onRemove={() => removeWidget(widget.id)} theme={theme} />
                 )}
+      {/* TWNI Camera Selector Overlay */}
+      {isTwniDialogOpen && (
+        <TwniCameraSelector
+          onSelect={handleAddTwniCamera}
+          onClose={() => setIsTwniDialogOpen(false)}
+        />
+      )}
               </div>
             ))}
           </div>

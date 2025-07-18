@@ -16,6 +16,8 @@ export interface Widget {
   longitude?: number // For weather widgets
   location?: string // For weather widgets - display name
   twitchChannel?: string // For twitch widgets
+  cameraId?: number // For TrafficWatchNI widgets
+  cameraRegion?: string // For TrafficWatchNI widgets
 }
 
 export interface LayoutData {
