@@ -1,8 +1,11 @@
 
+
 import type { Metadata } from 'next'
 import './globals.css'
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import AnnouncementPopup from './components/announcement-popup';
+import ANNOUNCEMENT_MESSAGES from './components/announcement-message';
 
 
 export const metadata: Metadata = {
@@ -33,6 +36,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body>
         {children}
+        <AnnouncementPopup messages={ANNOUNCEMENT_MESSAGES} />
         <footer className="w-full border-t mt-8 py-4 bg-background text-center text-foreground flex flex-col items-center gap-2">
           <a
             href="https://github.com/CiaranMcAleer/Tiktok-Multiviewer"

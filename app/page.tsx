@@ -106,7 +106,8 @@ function MultiviewerApp() {
     "Weather widgets show current conditions and 3-day forecasts",
     "Weather data updates every 10 minutes automatically",
     "Twitch channels must be live to see content - supports playback controls",
-    "Traffic cameras update every 20 seconds",
+    "Traffic cameras update every 5 seconds by default",
+    "If you want to add a TrafficWatchNI camera with a custom refresh rate, use the + button and select TrafficWatchNI",
     "Use the + button for quick widgets like maps and notes",
     "Share your layout with the export button",
   ]
