@@ -26,6 +26,29 @@ const AnnouncementPopup: React.FC<AnnouncementPopupProps> = ({ messages, duratio
 
   if (current >= messages.length || !visible) return null;
 
+  // Helper to render links in the message as clickable <a> tags
+  function renderMessageWithLinks(text: string) {
+    // Simple URL regex (http/https only)
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    return parts.map((part, i) => {
+      if (urlRegex.test(part)) {
+        return (
+          <a
+            key={i}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#60a5fa', textDecoration: 'underline', wordBreak: 'break-all' }}
+          >
+            {part}
+          </a>
+        );
+      }
+      return <React.Fragment key={i}>{part}</React.Fragment>;
+    });
+  }
+
   return (
     <div style={{
       position: 'fixed',
@@ -43,7 +66,7 @@ const AnnouncementPopup: React.FC<AnnouncementPopupProps> = ({ messages, duratio
       pointerEvents: 'auto',
       transition: 'opacity 0.3s',
     }}>
-      <strong>Announcement:</strong> {messages[current]}
+      <strong>Announcement:</strong> {renderMessageWithLinks(messages[current])}
     </div>
   );
 };
