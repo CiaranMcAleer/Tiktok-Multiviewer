@@ -1147,13 +1147,23 @@ function MultiviewerApp() {
                 ) : (
                   <StreamWidget widget={widget} onRemove={() => removeWidget(widget.id)} theme={theme} />
                 )}
-      {/* TWNI Camera Selector Overlay */}
-      {isTwniDialogOpen && (
-        <TwniCameraSelector
-          onSelect={handleAddTwniCamera}
-          onClose={() => setIsTwniDialogOpen(false)}
-        />
-      )}
+      {/* TWNI Camera Selector Dialog */}
+      <Dialog open={isTwniDialogOpen} onOpenChange={setIsTwniDialogOpen}>
+        <DialogContent className="z-[9999]">
+          <DialogHeader>
+            <DialogTitle>Add TrafficWatchNI Camera</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4 space-y-4">
+            <div className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-3 rounded-md">
+              <strong>Note:</strong> Select a camera and refresh interval. TrafficWatchNI cameras update every 5 seconds by default. You can add multiple cameras to your layout.
+            </div>
+            <TwniCameraSelector
+              onSelect={handleAddTwniCamera}
+              onClose={() => setIsTwniDialogOpen(false)}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
               </div>
             ))}
           </div>

@@ -228,7 +228,11 @@ export default function MapWidget({ title, onRemove, theme }: MapWidgetProps) {
               <span className="ml-2 text-sm text-muted-foreground">{userLocation ? "Loading map..." : "Getting your location..."}</span>
             </div>
           )}
-          <div id={`map-${title}`} className="w-full h-full rounded-b-lg" style={{ minHeight: "320px" }} />
+          <div
+            id={`map-${title}`}
+            className="w-full h-full rounded-b-lg"
+            style={{ minHeight: "320px", zIndex: 0, position: "relative" }}
+          />
         </CardContent>
       </Card>
     </>
