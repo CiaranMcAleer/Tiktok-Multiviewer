@@ -645,7 +645,7 @@ function MultiviewerApp() {
 
   return (
     <div
-      className={`min-h-screen transition-colors duration-200 ${
+      className={`min-h-screen transition-colors duration-200 w-screen max-w-screen overflow-x-hidden ${
         theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"
       }`}
     >
@@ -655,10 +655,10 @@ function MultiviewerApp() {
           theme === "dark" ? "border-gray-700 bg-gray-800" : "border-gray-200 bg-white"
         }`}
       >
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Multiviewer</h1>
-            <div className="flex items-center gap-2">
+        <div className="container mx-auto px-4 py-4 w-full max-w-full">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <h1 className="text-2xl font-bold mb-2 md:mb-0">Multiviewer</h1>
+            <div className="flex flex-row flex-wrap gap-2 items-center">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full">
@@ -699,42 +699,70 @@ function MultiviewerApp() {
           </div>
 
           {/* Controls */}
-          <div className="flex gap-2 mb-2">
-            <Input
-              placeholder="YouTube, TikTok, Twitch URLs or tw:ninja, yt:creator, @user"
-              value={inputUrl}
-              onChange={(e) => setInputUrl(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && addWidget()}
-              className={`flex-1 ${theme === "dark" ? "bg-gray-700 border-gray-600" : ""}`}
-            />
-
-            <Input
-              placeholder="Title (optional)"
-              value={inputTitle}
-              onChange={(e) => setInputTitle(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && addWidget()}
-              className={`max-w-[200px] ${theme === "dark" ? "bg-gray-700 border-gray-600" : ""}`}
-            />
-
-            <Button onClick={() => addWidget()} disabled={widgets.length >= 10}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Stream
-            </Button>
-
-            <Button
-              onClick={() => addWidget("map")}
-              disabled={widgets.length >= 10}
-              variant="outline"
-              className={theme === "dark"
-                ? "text-white border-gray-600 bg-gray-800 hover:bg-gray-700"
-                : "text-white bg-black hover:bg-gray-900 border-black"}
-            >
-              <Map className="h-4 w-4 mr-2" />
-              Add Map
-            </Button>
+          <div className="flex flex-col gap-4 mb-2 w-full max-w-full px-2 md:px-4">
+            <div className="flex flex-col gap-2 w-full max-w-full md:flex-row md:gap-2">
+              <div className="flex flex-col gap-2 w-full md:flex-row md:gap-2">
+                <div className="relative w-full max-w-full min-h-[44px] md:w-3/4">
+                  <Input
+                    value={inputUrl}
+                    onChange={(e) => setInputUrl(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && addWidget()}
+                    className={`w-full max-w-full min-h-[44px] text-base pr-2 ${theme === "dark" ? "bg-gray-700 border-gray-600" : ""}`}
+                    // Remove placeholder for custom marquee
+                    placeholder=""
+                  />
+                  {inputUrl === "" && (
+                    <div
+                      className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none w-[calc(100%-1.5rem)] overflow-hidden text-gray-400 text-base whitespace-nowrap"
+                      style={{ zIndex: 1 }}
+                    >
+                      <span className="block animate-marquee">
+                        YouTube, TikTok, Twitch URLs or tw:ninja, yt:creator, @user
+                      </span>
+                    </div>
+                  )}
+                  <style>{`
+                    @keyframes marquee {
+                      0% { transform: translateX(0); }
+                      100% { transform: translateX(-50%); }
+                    }
+                    .animate-marquee {
+                      display: inline-block;
+                      min-width: 200%;
+                      animation: marquee 12s linear infinite;
+                    }
+                  `}</style>
+                </div>
+                <Input
+                  placeholder="Title (optional)"
+                  value={inputTitle}
+                  onChange={(e) => setInputTitle(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && addWidget()}
+                  className={`w-full max-w-full min-h-[44px] text-base md:w-1/4 ${theme === "dark" ? "bg-gray-700 border-gray-600" : ""}`}
+                />
+              </div>
+              <div className="flex flex-col gap-2 w-full max-w-full md:flex-row md:w-auto">
+                <Button onClick={() => addWidget()} disabled={widgets.length >= 10} className="w-full max-w-full min-h-[44px] text-base">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Stream
+                </Button>
+                <Button
+                  onClick={() => addWidget("map")}
+                  disabled={widgets.length >= 10}
+                  variant="outline"
+                  className={`w-full max-w-full min-h-[44px] text-base ${theme === "dark"
+                    ? "text-white border-gray-600 bg-gray-800 hover:bg-gray-700"
+                    : "text-white bg-black hover:bg-gray-900 border-black"}`}
+                >
+                  <Map className="h-4 w-4 mr-2" />
+                  Add Map
+                </Button>
+              </div>
+            </div>
           </div>
 
-          <div className="flex justify-between items-center mt-2">
+          {/* Stats and Secondary Controls */}
+          <div className="flex flex-col gap-2 mt-2 md:flex-row md:justify-between md:items-center">
             <div className="text-sm text-gray-500">
               {widgets.length}/10 widgets •
               {widgets.filter((w) => w.type === "tiktok").length > 0 &&
@@ -761,15 +789,16 @@ function MultiviewerApp() {
                 ` ${widgets.filter((w) => w.type === "twitch").length} Twitch`}
             </div>
 
-            <div className="flex gap-2">
-              <Button variant="ghost" size="sm" onClick={refreshAllWidgets}>
+            <div className="flex flex-col gap-2 w-full md:flex-row md:w-auto md:gap-2">
+              <Button variant="ghost" size="sm" onClick={refreshAllWidgets} className="w-full min-h-[40px] md:w-auto">
                 <RefreshCw className="h-4 w-4 mr-1" />
                 Refresh All
               </Button>
 
+              {/* ...existing code for Dialogs and Buttons... */}
               <Dialog open={isGridDialogOpen} onOpenChange={setIsGridDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="w-full min-h-[40px] md:w-auto">
                     <Grid className="h-4 w-4 mr-1" />
                     Grid Settings
                   </Button>
@@ -811,7 +840,7 @@ function MultiviewerApp() {
 
               <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" onClick={shareLayout} disabled={widgets.length === 0}>
+                  <Button variant="ghost" size="sm" onClick={shareLayout} disabled={widgets.length === 0} className="w-full min-h-[40px] md:w-auto">
                     <Share2 className="h-4 w-4 mr-1" />
                     Share Layout
                   </Button>
@@ -832,7 +861,7 @@ function MultiviewerApp() {
 
               <Dialog open={isLoadDialogOpen} onOpenChange={setIsLoadDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" className="w-full min-h-[40px] md:w-auto">
                     <Download className="h-4 w-4 mr-1" />
                     Load Layout
                   </Button>
@@ -1002,7 +1031,7 @@ function MultiviewerApp() {
                 </DialogContent>
               </Dialog>
 
-              <Button variant="ghost" size="sm" onClick={clearAllWidgets} disabled={widgets.length === 0}>
+              <Button variant="ghost" size="sm" onClick={clearAllWidgets} disabled={widgets.length === 0} className="w-full min-h-[40px] md:w-auto">
                 <Trash2 className="h-4 w-4 mr-1" />
                 Clear All
               </Button>
