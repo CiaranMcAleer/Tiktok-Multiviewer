@@ -394,7 +394,7 @@ export default function WorldTimeWidget({
   }
 
   return (
-    <Card className="relative h-96 bg-background border-border">
+    <Card className="relative h-96 bg-background border-border overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between p-3">
         <div className="flex items-center gap-2 min-w-0">
           <Clock className="h-4 w-4" />
@@ -410,20 +410,25 @@ export default function WorldTimeWidget({
         </Button>
       </CardHeader>
 
-      <CardContent className="p-4 h-80 flex flex-col">
-        <div className="flex-1 flex flex-col items-center justify-center text-center">
-          <div className="mb-4">
+      <CardContent className="p-4 h-80 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col items-center justify-center text-center w-full">
+          <div className="mb-4 w-full">
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" role="combobox" aria-expanded={open} className="w-64 justify-between bg-background text-foreground hover:bg-accent hover:text-accent-foreground">
-                  <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={open}
+                  className="w-full max-w-xs md:w-64 md:max-w-md justify-between bg-background text-foreground hover:bg-accent hover:text-accent-foreground overflow-hidden"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
                     <MapPin className="h-3 w-3" />
                     <span className="truncate">{city}</span>
                   </div>
                   <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-80 p-0">
+              <PopoverContent className="w-full max-w-xs md:w-80 md:max-w-lg p-0 overflow-hidden">
                 <Command>
                   <CommandInput
                     placeholder="Search timezones (e.g., London, New_York, Jerusalem)..."
@@ -435,9 +440,9 @@ export default function WorldTimeWidget({
                     <CommandGroup>
                       {filteredTimezones.slice(0, 50).map((tz) => (
                         <CommandItem key={tz} value={tz} onSelect={() => handleCityChange(tz)}>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
                             <MapPin className="h-3 w-3" />
-                            <span className="text-sm">{formatTimezone(tz)}</span>
+                            <span className="text-sm truncate">{formatTimezone(tz)}</span>
                           </div>
                         </CommandItem>
                       ))}
