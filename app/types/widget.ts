@@ -1,4 +1,4 @@
-export type WidgetType = "tiktok" | "youtube" | "trafficcam" | "map" | "worldtime" | "website" | "notes" | "stream" | "rss" | "weather" | "twitch"
+export type WidgetType = "tiktok" | "youtube" | "trafficcam" | "map" | "worldtime" | "website" | "notes" | "stream" | "rss" | "weather" | "twitch" | "bankholidays"
 
 export interface Widget {
   id: string

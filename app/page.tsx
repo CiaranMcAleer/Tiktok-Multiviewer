@@ -23,6 +23,7 @@ import {
   Rss,
   CloudSun,
   Tv,
+  CalendarDays,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -41,6 +42,7 @@ import RSSWidget from "./components/rss-widget"
 import WeatherWidget from "./components/weather-widget"
 import WeatherLocationSelector from "./components/weather-location-selector"
 import TwitchWidget from "./components/twitch-widget"
+import BankHolidaysWidget from "./components/bank-holidays-widget"
 import { ThemeProvider, useTheme } from "./components/theme-provider"
 import type { Widget, LayoutData, WidgetType } from "./types/widget"
 import PopupManager from "./utils/popup-manager"
@@ -227,6 +229,10 @@ function MultiviewerApp() {
       type = "twitch"
       url = ""
       title = title || "Twitch Stream"
+    } else if (forceType === "bankholidays") {
+      type = "bankholidays"
+      url = ""
+      title = title || "UK Bank Holidays"
     } else if (url) {
       // Auto-detect content type based on URL
       if (url.includes("twitch.tv") || url.includes("twitch.com")) {
@@ -690,6 +696,10 @@ function MultiviewerApp() {
                     <Camera className="h-4 w-4 mr-2" />
                     TrafficWatchNI Camera
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => addWidget("bankholidays")}> 
+                    <CalendarDays className="h-4 w-4 mr-2" />
+                    UK Bank Holidays
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full">
@@ -1144,6 +1154,8 @@ function MultiviewerApp() {
                   />
                 ) : widget.type === "trafficcam" ? (
                   <StreamWidget widget={widget} onRemove={() => removeWidget(widget.id)} theme={theme} />
+                ) : widget.type === "bankholidays" ? (
+  <BankHolidaysWidget onRemove={() => removeWidget(widget.id)} theme={theme} />
                 ) : (
                   <StreamWidget widget={widget} onRemove={() => removeWidget(widget.id)} theme={theme} />
                 )}
