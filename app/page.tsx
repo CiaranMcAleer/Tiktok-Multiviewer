@@ -595,8 +595,25 @@ function MultiviewerApp() {
         // Close all existing popups
         popupManager.current.closeAll()
 
-        // Set new widgets
-        setWidgets(layoutData.widgets)
+        // Sanitize website widgets
+        const sanitizedWidgets = layoutData.widgets.map(widget => {
+          if (widget.type === "website") {
+            // Default title to hostname if missing or empty
+            let title = widget.title?.trim()
+            if (!title) {
+              try {
+                title = new URL(widget.url).hostname
+              } catch {
+                title = "Website"
+              }
+            }
+            // Remove refreshInterval unless explicitly supported
+            const { refreshInterval, ...rest } = widget
+            return { ...rest, title }
+          }
+          return widget
+        })
+        setWidgets(sanitizedWidgets)
         return true
       }
       return false
