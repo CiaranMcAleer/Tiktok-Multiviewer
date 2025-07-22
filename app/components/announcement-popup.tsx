@@ -11,8 +11,7 @@ const AnnouncementPopup: React.FC<AnnouncementPopupProps> = ({ messages, duratio
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
-    if (current < messages.length) {
-      setVisible(true);
+    if (current < messages.length && visible) {
       const timer = setTimeout(() => {
         setVisible(false);
         setTimeout(() => {
@@ -22,7 +21,7 @@ const AnnouncementPopup: React.FC<AnnouncementPopupProps> = ({ messages, duratio
       }, duration);
       return () => clearTimeout(timer);
     }
-  }, [current, duration, messages.length]);
+  }, [current, duration, messages.length, visible]);
 
   if (current >= messages.length || !visible) return null;
 
@@ -65,8 +64,31 @@ const AnnouncementPopup: React.FC<AnnouncementPopupProps> = ({ messages, duratio
       minWidth: '250px',
       pointerEvents: 'auto',
       transition: 'opacity 0.3s',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '1rem',
     }}>
       <strong>Announcement:</strong> {renderMessageWithLinks(messages[current])}
+      <button
+        aria-label="Dismiss announcement"
+        onClick={() => {
+          setVisible(false);
+          setTimeout(() => {
+            setCurrent((prev) => prev + 1);
+            setVisible(true);
+          }, 300);
+        }}
+        style={{
+          background: 'transparent',
+          border: 'none',
+          color: '#fff',
+          fontSize: '1.2rem',
+          cursor: 'pointer',
+          marginLeft: 'auto',
+        }}
+      >
+        &#10005;
+      </button>
     </div>
   );
 };
