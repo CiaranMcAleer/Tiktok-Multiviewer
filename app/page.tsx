@@ -50,19 +50,23 @@ import PopupManager from "./utils/popup-manager"
 function MultiviewerApp() {
   // Handler for adding a TWNI camera from the selector overlay
   const handleAddTwniCamera = (
-    camera: { id: number; name: string; region: string; url: string },
+    camera: { name: string; viewerUrl: string; imageUrl: string },
     refreshInterval: number
   ) => {
+    // Extract camera ID from viewerUrl for backward compatibility
+    const idMatch = camera.viewerUrl.match(/id=(\d+)/)
+    const cameraId = idMatch ? parseInt(idMatch[1], 10) : undefined
+
     setWidgets((prev) => [
       ...prev,
       {
         id: Date.now().toString(),
         type: "trafficcam",
-        url: camera.url,
+        url: camera.viewerUrl,
         title: camera.name,
         refreshInterval: refreshInterval * 1000,
-        cameraId: camera.id,
-        cameraRegion: camera.region,
+        cameraId: cameraId,
+        cameraRegion: undefined, // Keeping this for later, We don't have region info in the new structure
       },
     ])
     setIsTwniDialogOpen(false)
@@ -185,7 +189,7 @@ function MultiviewerApp() {
     return null
   }
 
-  const addWidget = (forceType?: WidgetType) => {
+  const addWidget = async (forceType?: WidgetType) => {
     if (widgets.length >= 30) {
       alert("Maximum 30 widgets allowed")
       return
@@ -301,10 +305,31 @@ function MultiviewerApp() {
         const idMatch = url.match(/[?&]id=(\d+)/)
         if (idMatch) {
           cameraId = parseInt(idMatch[1], 10)
+          
+          // Try to fetch camera name from JSON data
+          try {
+            const response = await fetch("/twni-cameras.json")
+            if (response.ok) {
+              const cameraData = await response.json()
+              const camera = cameraData.find((c: any) => {
+                const camIdMatch = c.viewerUrl.match(/id=(\d+)/)
+                return camIdMatch && camIdMatch[1] === idMatch[1]
+              })
+              
+              if (camera) {
+                title = title || camera.name
+              } else {
+                title = title || `Traffic Camera #${cameraId}`
+              }
+            } else {
+              title = title || `Traffic Camera #${cameraId}`
+            }
+          } catch (e) {
+            title = title || `Traffic Camera #${cameraId}`
+          }
+        } else {
+          title = title || "Traffic Camera"
         }
-        // Try to extract region from known cameras (if available)
-        // (Optional: could use a lookup table if you have one)
-        title = title || `Traffic Camera${cameraId ? ' #' + cameraId : ''}`
       } else if (url.includes("traffic")) {
         type = "trafficcam"
         title = title || "Traffic Camera"
@@ -346,7 +371,7 @@ function MultiviewerApp() {
       type,
       url,
       title,
-      refreshInterval: type === "trafficcam" ? 20000 : type === "rss" ? 5 * 60 * 1000 : undefined,
+      refreshInterval: type === "trafficcam" ? (url.includes("trafficwatchni.com") ? 5000 : 20000) : type === "rss" ? 5 * 60 * 1000 : undefined,
       city: type === "worldtime" ? "Belfast" : undefined,
       timezone: type === "worldtime" ? "Europe/London" : undefined,
       content: type === "notes" ? "" : undefined,
@@ -566,7 +591,7 @@ function MultiviewerApp() {
           popupManager.current.openPopup(
             widget.id,
             widget.type === "trafficcam"
-              ? `${widget.url}${widget.url.includes("?") ? "&" : "?"}t=${Date.now()}`
+              ? `${widget.url}${widget.url && widget.url.includes("?") ? "&" : "?"}t=${Date.now()}`
               : widget.url,
             widget.title,
             widget.type,
@@ -689,7 +714,7 @@ function MultiviewerApp() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => addWidget("worldtime")}> 
+                  <DropdownMenuItem onClick={() => addWidget("worldtime").catch(console.error)}> 
                     <Clock className="h-4 w-4 mr-2" />
                     World Time
                   </DropdownMenuItem>
@@ -713,7 +738,7 @@ function MultiviewerApp() {
                     <Camera className="h-4 w-4 mr-2" />
                     TrafficWatchNI Camera
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => addWidget("bankholidays")}> 
+                  <DropdownMenuItem onClick={() => addWidget("bankholidays").catch(console.error)}> 
                     <CalendarDays className="h-4 w-4 mr-2" />
                     UK Bank Holidays
                   </DropdownMenuItem>
@@ -733,7 +758,7 @@ function MultiviewerApp() {
                   <Input
                     value={inputUrl}
                     onChange={(e) => setInputUrl(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && addWidget()}
+                    onKeyPress={(e) => e.key === "Enter" && addWidget().catch(console.error)}
                     className={`w-full max-w-full min-h-[44px] text-base pr-2 ${theme === "dark" ? "bg-gray-700 border-gray-600" : ""}`}
                     // Remove placeholder for custom marquee
                     placeholder=""
@@ -764,17 +789,17 @@ function MultiviewerApp() {
                   placeholder="Title (optional)"
                   value={inputTitle}
                   onChange={(e) => setInputTitle(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && addWidget()}
+                  onKeyPress={(e) => e.key === "Enter" && addWidget().catch(console.error)}
                   className={`w-full max-w-full min-h-[44px] text-base md:w-1/4 ${theme === "dark" ? "bg-gray-700 border-gray-600" : ""}`}
                 />
               </div>
               <div className="flex flex-col gap-2 w-full max-w-full md:flex-row md:w-auto">
-                <Button onClick={() => addWidget()} disabled={widgets.length >= 10} className="w-full max-w-full min-h-[44px] text-base">
+                <Button onClick={() => addWidget().catch(console.error)} disabled={widgets.length >= 10} className="w-full max-w-full min-h-[44px] text-base">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Stream
                 </Button>
                 <Button
-                  onClick={() => addWidget("map")}
+                  onClick={() => addWidget("map").catch(console.error)}
                   disabled={widgets.length >= 10}
                   variant="outline"
                   className={`w-full max-w-full min-h-[44px] text-base ${theme === "dark"
@@ -1176,6 +1201,12 @@ function MultiviewerApp() {
                 ) : (
                   <StreamWidget widget={widget} onRemove={() => removeWidget(widget.id)} theme={theme} />
                 )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* TWNI Camera Selector Dialog */}
       <Dialog open={isTwniDialogOpen} onOpenChange={setIsTwniDialogOpen}>
         <DialogContent className="z-[9999]">
@@ -1193,11 +1224,6 @@ function MultiviewerApp() {
           </div>
         </DialogContent>
       </Dialog>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   )
 }
