@@ -1,13 +1,11 @@
 import React, { useState, useMemo } from "react"
 import { useTheme } from "./theme-provider"
-import cameras from "./twni-cameras.json"
 
 
 interface Camera {
-  id: number
   name: string
-  region: string
-  url: string
+  viewerUrl: string
+  imageUrl: string
 }
 
 interface Props {
@@ -18,25 +16,43 @@ interface Props {
 export default function TwniCameraSelector({ onSelect, onClose }: Props) {
   const { theme } = useTheme()
   const [search, setSearch] = useState("")
-  const [region, setRegion] = useState("")
   const [refresh, setRefresh] = useState(5)
-  const regions = useMemo(() => Array.from(new Set(cameras.map(c => c.region))), [])
-  const filtered = useMemo(() => cameras.filter(c =>
-    (!region || c.region === region) &&
-    (c.name.toLowerCase().includes(search.toLowerCase()) || c.id.toString().includes(search))
-  ), [search, region])
+  const [cameras, setCameras] = useState<Camera[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Detect duplicate IDs across regions
-  const duplicateIds = useMemo(() => {
-    const seen = new Set();
-    const dups = new Set();
-    cameras.forEach(c => {
-      const key = c.id;
-      if (seen.has(key)) dups.add(key);
-      else seen.add(key);
-    });
-    return Array.from(dups);
-  }, []);
+  // Fetch camera data from static JSON
+  React.useEffect(() => {
+    setLoading(true)
+    fetch("/twni-cameras.json")
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to load camera data")
+        return res.json()
+      })
+      .then(data => {
+        setCameras(data)
+        setLoading(false)
+      })
+      .catch(e => {
+        setError("Could not load camera data")
+        setLoading(false)
+      })
+  }, [])
+
+  const filtered = useMemo(() => {
+    // Extract ID from viewerUrl for search functionality
+    const extractId = (url: string) => {
+      const match = url.match(/id=(\d+)/)
+      return match ? match[1] : ''
+    }
+    
+    return cameras.filter(c =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      extractId(c.viewerUrl).includes(search)
+    )
+  }, [search, cameras])
+
+  // Since we don't have regions anymore, no need for duplicate ID detection
 
   // Theme-based classes for panel and input
   const bgPanel = theme === "dark" ? "bg-gray-800 text-white border-gray-700" : "bg-white text-black border-gray-200"
@@ -59,20 +75,6 @@ export default function TwniCameraSelector({ onSelect, onClose }: Props) {
             onChange={e => setSearch(e.target.value)}
           />
         </div>
-        <div>
-          <label htmlFor="twni-region" className="block text-sm font-medium mb-1">Region</label>
-          <select
-            id="twni-region"
-            className={`rounded px-2 py-1 ${bgInput}`}
-            value={region}
-            onChange={e => setRegion(e.target.value)}
-          >
-            <option value="">All Regions</option>
-            {regions.map(r => (
-              <option key={r} value={r}>{r}</option>
-            ))}
-          </select>
-        </div>
       </div>
       <div>
         <label htmlFor="twni-refresh" className="block mb-1 font-medium">Refresh Interval</label>
@@ -92,29 +94,33 @@ export default function TwniCameraSelector({ onSelect, onClose }: Props) {
           <span className="text-xs w-16 text-right">{refresh === 2 ? "Real-time (2s)" : `${refresh}s`}</span>
         </div>
       </div>
-      {/* Duplicate ID warning */}
-      {duplicateIds.length > 0 && (
-        <div className="p-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded">
-          Warning: Duplicate camera IDs exist (IDs: {duplicateIds.join(", ")}). This may cause confusion when searching by ID.
-        </div>
-      )}
       <div className={`max-h-64 overflow-y-auto border rounded transition-colors duration-200 ${bgList}`}>
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className={`p-4 ${textMuted}`}>Loading cameras...</div>
+        ) : error ? (
+          <div className={`p-4 text-red-600`}>{error}</div>
+        ) : filtered.length === 0 ? (
           <div className={`p-4 ${textMuted}`}>No cameras found.</div>
         ) : (
           <ul>
-            {filtered.map(cam => (
-              <li key={`${cam.region}-${cam.id}`} className={`last:border-b-0 flex items-center justify-between px-3 py-2 border-b transition-colors duration-200 ${bgList} ${hoverList}`}>
-                <div>
-                  <div className="font-medium">{cam.name}</div>
-                  <div className={`text-xs ${textMuted}`}>{cam.region} &middot; ID: {cam.id}</div>
-                </div>
-                <button
-                  className={`text-white px-3 py-1 rounded ${btn}`}
-                  onClick={() => onSelect(cam, refresh)}
-                >Add</button>
-              </li>
-            ))}
+            {filtered.map((cam, index) => {
+              // Extract ID from viewerUrl for display
+              const idMatch = cam.viewerUrl.match(/id=(\d+)/)
+              const cameraId = idMatch ? idMatch[1] : index
+              
+              return (
+                <li key={`${index}-${cam.name}-${cameraId}`} className={`last:border-b-0 flex items-center justify-between px-3 py-2 border-b transition-colors duration-200 ${bgList} ${hoverList}`}>
+                  <div>
+                    <div className="font-medium">{cam.name}</div>
+                    <div className={`text-xs ${textMuted}`}>ID: {cameraId}</div>
+                  </div>
+                  <button
+                    className={`text-white px-3 py-1 rounded ${btn}`}
+                    onClick={() => onSelect(cam, refresh)}
+                  >Add</button>
+                </li>
+              )
+            })}
           </ul>
         )}
       </div>

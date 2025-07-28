@@ -10,27 +10,45 @@ export const extractTrafficWatchID = (url: string): string | null => {
   return match ? match[1] : null
 }
 
-export const extractTrafficImageUrl = async (url: string): Promise<string | null> => {
-  try {
-    const cameraId = extractTrafficWatchID(url)
-    if (!cameraId) return null
-
-    // Try to fetch the page and extract the image URL
-    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`)
-    const data = await response.json()
-
-    // Look for the image URL pattern in the HTML
-    const imageMatch = data.contents.match(/https:\/\/cctv\.trafficwatchni\.com\/\d+\.jpg/i)
-    if (imageMatch) {
-      return imageMatch[0]
-    } else {
-      // Fallback: construct likely image URL based on camera ID
-      return `https://cctv.trafficwatchni.com/${cameraId}.jpg`
+/**
+ * Extract the camera title from a TrafficWatchNI viewer page.
+ */
+export const extractTrafficCameraTitle = (url: string): Promise<string | null> => {
+  return (async () => {
+    try {
+      const res = await fetch(url, { credentials: "omit" });
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      // The camera title is in a <header ...> element with a title attribute
+      const header = doc.querySelector('header[title]');
+      if (header && header.getAttribute('title')) {
+        return header.getAttribute('title');
+      }
+      // fallback: use text content
+      if (header && header.textContent) {
+        return header.textContent.trim();
+      }
+    } catch (e) {
+      // ignore and fallback
     }
-  } catch (error) {
-    console.error("Failed to extract TrafficWatch image URL:", error)
-    // Fallback: try to construct the URL
-    const cameraId = extractTrafficWatchID(url)
-    return cameraId ? `https://cctv.trafficwatchni.com/${cameraId}.jpg` : null
+    return null;
+  })();
+}
+
+export const extractTrafficImageUrl = async (url: string): Promise<string | null> => {
+  // Try to fetch the viewer page and extract the camera image URL from <img class="cctvImage">
+  try {
+    const res = await fetch(url, { credentials: "omit" });
+    const html = await res.text();
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const img = doc.querySelector("img.cctvImage") as HTMLImageElement | null;
+    if (img && img.src) {
+      return img.src.startsWith("http") ? img.src : new URL(img.src, url).href;
+    }
+  } catch (e) {
+    // ignore and fallback
   }
+  // Fallback: construct from cameraId (may be incorrect for some cameras)
+  const cameraId = extractTrafficWatchID(url);
+  return cameraId ? `https://cctv.trafficwatchni.com/${cameraId}.jpg` : null;
 }

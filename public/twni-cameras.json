@@ -1,0 +1,627 @@
+[
+  {
+    "name": "Westlink - Shankill",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=218",
+    "imageUrl": "https://cctv.trafficwatchni.com/503.jpg"
+  },
+  {
+    "name": "A2 - Tillysburn",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=44",
+    "imageUrl": "https://cctv.trafficwatchni.com/3260.jpg"
+  },
+  {
+    "name": "A2 - Holywood Esplanade",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=45",
+    "imageUrl": "https://cctv.trafficwatchni.com/3261.jpg"
+  },
+  {
+    "name": "A12 Clifton Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=9",
+    "imageUrl": "https://cctv.trafficwatchni.com/8.jpg"
+  },
+  {
+    "name": "A12 Roden Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=10",
+    "imageUrl": "https://cctv.trafficwatchni.com/4.jpg"
+  },
+  {
+    "name": "M1 - Stockmans Lane",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=171",
+    "imageUrl": "https://cctv.trafficwatchni.com/106.jpg"
+  },
+  {
+    "name": "Saintfield Road - Primrose Hill",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=43",
+    "imageUrl": "https://cctv.trafficwatchni.com/3259.jpg"
+  },
+  {
+    "name": "Upper Knockbreda Rd - Cregagh Rd",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=191",
+    "imageUrl": "https://cctv.trafficwatchni.com/404.jpg"
+  },
+  {
+    "name": "East Bridge Street - Central Station",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=156",
+    "imageUrl": "https://cctv.trafficwatchni.com/21.jpg"
+  },
+  {
+    "name": "M1 Broadway",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=11",
+    "imageUrl": "https://cctv.trafficwatchni.com/3.jpg"
+  },
+  {
+    "name": "Ballygowan Road - Knock Road",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=190",
+    "imageUrl": "https://cctv.trafficwatchni.com/402_1.jpg"
+  },
+  {
+    "name": "M3 - Sydenham Bypass",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=217",
+    "imageUrl": "https://cctv.trafficwatchni.com/3298.jpg"
+  },
+  {
+    "name": "Boucher Road - Tates Avenue",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=54",
+    "imageUrl": "https://cctv.trafficwatchni.com/3270.jpg"
+  },
+  {
+    "name": "Shaftesbury Square",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=3",
+    "imageUrl": "https://cctv.trafficwatchni.com/16.jpg"
+  },
+  {
+    "name": "Durham St - College Sq Nth",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=201",
+    "imageUrl": "https://cctv.trafficwatchni.com/10_1.jpg"
+  },
+  {
+    "name": "M2 - Fortwilliam North (1B16)",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=208",
+    "imageUrl": "https://cctv.trafficwatchni.com/207.jpg"
+  },
+  {
+    "name": "Upp K'Breda - Milltown Rd",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=211",
+    "imageUrl": "https://cctv.trafficwatchni.com/407.jpg"
+  },
+  {
+    "name": "Knock Road - Upper Newtownards Road",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=48",
+    "imageUrl": "https://cctv.trafficwatchni.com/3264.jpg"
+  },
+  {
+    "name": "Falls Road - Donegall Road",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=28",
+    "imageUrl": "https://cctv.trafficwatchni.com/3244.jpg"
+  },
+  {
+    "name": "M2 - Greencastle - Jct 2",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=36",
+    "imageUrl": "https://cctv.trafficwatchni.com/3252.jpg"
+  },
+  {
+    "name": "Ormeau AV - Linehall ST",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=204",
+    "imageUrl": "https://cctv.trafficwatchni.com/30.jpg"
+  },
+  {
+    "name": "Oxford Street - Ann Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=151",
+    "imageUrl": "https://cctv.trafficwatchni.com/2_1.jpg"
+  },
+  {
+    "name": "Falls Road - Grosvenor Road",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=162",
+    "imageUrl": "https://cctv.trafficwatchni.com/40_1.jpg"
+  },
+  {
+    "name": "M1 Sprucefield",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=4",
+    "imageUrl": "https://cctv.trafficwatchni.com/6.jpg"
+  },
+  {
+    "name": "University Road - Stranmillis Road",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=160",
+    "imageUrl": "https://cctv.trafficwatchni.com/33.jpg"
+  },
+  {
+    "name": "Victoria Street - High Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=153",
+    "imageUrl": "https://cctv.trafficwatchni.com/5_1.jpg"
+  },
+  {
+    "name": "Belvoir C'way - Newtownbreda Rd - Tesco's",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=50",
+    "imageUrl": "https://cctv.trafficwatchni.com/3266.jpg"
+  },
+  {
+    "name": "M1 - Blacks Rd - Jct 3",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=33",
+    "imageUrl": "https://cctv.trafficwatchni.com/3249.jpg"
+  },
+  {
+    "name": "Finaghy Crossroads",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=53",
+    "imageUrl": "https://cctv.trafficwatchni.com/3269.jpg"
+  },
+  {
+    "name": "Lisburn Road - Eglantine Avenue",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=161",
+    "imageUrl": "https://cctv.trafficwatchni.com/35.jpg"
+  },
+  {
+    "name": "Beersbridge Road - Castlereagh Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=157",
+    "imageUrl": "https://cctv.trafficwatchni.com/23.jpg"
+  },
+  {
+    "name": "Dock Street - Garmoyle Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=154",
+    "imageUrl": "https://cctv.trafficwatchni.com/7_1.jpg"
+  },
+  {
+    "name": "Westlink - Hospital",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=214",
+    "imageUrl": "https://cctv.trafficwatchni.com/590.jpg"
+  },
+  {
+    "name": "Malone Road - Old Stranmillis Road",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=51",
+    "imageUrl": "https://cctv.trafficwatchni.com/3267.jpg"
+  },
+  {
+    "name": "Malone Road - Balmoral Avenue",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=52",
+    "imageUrl": "https://cctv.trafficwatchni.com/3268.jpg"
+  },
+  {
+    "name": "N'ards RD - Albertbridge RD",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=203",
+    "imageUrl": "https://cctv.trafficwatchni.com/24.jpg"
+  },
+  {
+    "name": "Upper Newtownards Rd - Eastlink",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=25",
+    "imageUrl": "https://cctv.trafficwatchni.com/3241.jpg"
+  },
+  {
+    "name": "M1 Stockmans Lane",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=12",
+    "imageUrl": "https://cctv.trafficwatchni.com/12.jpg"
+  },
+  {
+    "name": "M3 - Dee Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=188",
+    "imageUrl": "https://cctv.trafficwatchni.com/303.jpg"
+  },
+  {
+    "name": "Chichester Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=1",
+    "imageUrl": "https://cctv.trafficwatchni.com/5.jpg"
+  },
+  {
+    "name": "Stewartstown Road / Michael Ferguson Roundabout",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=164",
+    "imageUrl": "https://cctv.trafficwatchni.com/44_1.jpg"
+  },
+  {
+    "name": "Upper Newtownards Rd - Dunlady Rd",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=26",
+    "imageUrl": "https://cctv.trafficwatchni.com/3242.jpg"
+  },
+  {
+    "name": "Westlink - Divis",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=213",
+    "imageUrl": "https://cctv.trafficwatchni.com/505.jpg"
+  },
+  {
+    "name": "Ormeau Road - Annadale Embankment",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=42",
+    "imageUrl": "https://cctv.trafficwatchni.com/3258.jpg"
+  },
+  {
+    "name": "Saintfield Road - School Rd",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=185",
+    "imageUrl": "https://cctv.trafficwatchni.com/246.jpg"
+  },
+  {
+    "name": "Upper Newtownards Rd - Stoney Rd",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=158",
+    "imageUrl": "https://cctv.trafficwatchni.com/26.jpg"
+  },
+  {
+    "name": "Upper Knockbreda Rd - Upper Galwally",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=49",
+    "imageUrl": "https://cctv.trafficwatchni.com/3265.jpg"
+  },
+  {
+    "name": "Ormeau Road - Ravenhill Road",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=183",
+    "imageUrl": "https://cctv.trafficwatchni.com/244.jpg"
+  },
+  {
+    "name": "Saintfield Road - Upper Galwally",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=184",
+    "imageUrl": "https://cctv.trafficwatchni.com/245.jpg"
+  },
+  {
+    "name": "M1 - Kennedy Way - Jct 2",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=170",
+    "imageUrl": "https://cctv.trafficwatchni.com/105.jpg"
+  },
+  {
+    "name": "Castlereagh Rd - Grand Parade/ Ladas Dr",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=27",
+    "imageUrl": "https://cctv.trafficwatchni.com/3243.jpg"
+  },
+  {
+    "name": "Westlink - York Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=55",
+    "imageUrl": "https://cctv.trafficwatchni.com/3271.jpg"
+  },
+  {
+    "name": "M2 - Duncrue St North (0B14)",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=207",
+    "imageUrl": "https://cctv.trafficwatchni.com/202.jpg"
+  },
+  {
+    "name": "Peters Hill - Millfield",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=155",
+    "imageUrl": "https://cctv.trafficwatchni.com/8_1.jpg"
+  },
+  {
+    "name": "Andersonstown Rd - Finaghy Rd Nth",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=163",
+    "imageUrl": "https://cctv.trafficwatchni.com/43.jpg"
+  },
+  {
+    "name": "M2 Sandyknowes",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=6",
+    "imageUrl": "https://cctv.trafficwatchni.com/13.jpg"
+  },
+  {
+    "name": "Milltown - Hospital Rd",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=212",
+    "imageUrl": "https://cctv.trafficwatchni.com/408.jpg"
+  },
+  {
+    "name": "Howard Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=2",
+    "imageUrl": "https://cctv.trafficwatchni.com/14.jpg"
+  },
+  {
+    "name": "Dublin Rd - Bruce Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=159",
+    "imageUrl": "https://cctv.trafficwatchni.com/31_1.jpg"
+  },
+  {
+    "name": "Ballynahinch Road - Carryduff",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=186",
+    "imageUrl": "https://cctv.trafficwatchni.com/249.jpg"
+  },
+  {
+    "name": "Sandy Row - Hope Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=202",
+    "imageUrl": "https://cctv.trafficwatchni.com/11.jpg"
+  },
+  {
+    "name": "M2 Duncrue Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=5",
+    "imageUrl": "https://cctv.trafficwatchni.com/7.jpg"
+  },
+  {
+    "name": "M3 - Lagan Bridge East",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=187",
+    "imageUrl": "https://cctv.trafficwatchni.com/301.jpg"
+  },
+  {
+    "name": "M3 Lagan Bridge",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=7",
+    "imageUrl": "https://cctv.trafficwatchni.com/9.jpg"
+  },
+  {
+    "name": "Albertbridge Road - Woodstock Link",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=24",
+    "imageUrl": "https://cctv.trafficwatchni.com/3240.jpg"
+  },
+  {
+    "name": "Oxford Street - Lanyon Place",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=152",
+    "imageUrl": "https://cctv.trafficwatchni.com/3_1.jpg"
+  },
+  {
+    "name": "Donegall Square South-Adelaide Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=41",
+    "imageUrl": "https://cctv.trafficwatchni.com/3257.jpg"
+  },
+  {
+    "name": "A2 Shore Rd - Trooperslane, Carrick",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=165",
+    "imageUrl": "https://cctv.trafficwatchni.com/55.jpg"
+  },
+  {
+    "name": "M22 - Dunsilly Roundabout",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=210",
+    "imageUrl": "https://cctv.trafficwatchni.com/226.jpg"
+  },
+  {
+    "name": "Strand Rd Coleraine",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=64",
+    "imageUrl": "https://cctv.trafficwatchni.com/3280.jpg"
+  },
+  {
+    "name": "A6 Toome",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=40",
+    "imageUrl": "https://cctv.trafficwatchni.com/3256.jpg"
+  },
+  {
+    "name": "Dublin Road, Antrim",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=193",
+    "imageUrl": "https://cctv.trafficwatchni.com/824.jpg"
+  },
+  {
+    "name": "Lodge Rd R'bout/Asda Coleraine",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=216",
+    "imageUrl": "https://cctv.trafficwatchni.com/3297.jpg"
+  },
+  {
+    "name": "Lodge Rd R'bout/Sandleford Coleraine",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=215",
+    "imageUrl": "https://cctv.trafficwatchni.com/3296.jpg"
+  },
+  {
+    "name": "Lodge Rd R'bout Lodge Coleraine",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=62",
+    "imageUrl": "https://cctv.trafficwatchni.com/3278.jpg"
+  },
+  {
+    "name": "M2 Templepatrick",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=17",
+    "imageUrl": "https://cctv.trafficwatchni.com/15.jpg"
+  },
+  {
+    "name": "M2 - Antrim Hospital",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=209",
+    "imageUrl": "https://cctv.trafficwatchni.com/225.jpg"
+  },
+  {
+    "name": "Old Bridge Coleraine",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=66",
+    "imageUrl": "https://cctv.trafficwatchni.com/3282.jpg"
+  },
+  {
+    "name": "M2 - Browns Rd",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=38",
+    "imageUrl": "https://cctv.trafficwatchni.com/3254.jpg"
+  },
+  {
+    "name": "Greenmount Coleraine",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=65",
+    "imageUrl": "https://cctv.trafficwatchni.com/3281.jpg"
+  },
+  {
+    "name": "Lodge Rd R'bout Newbridge Coleraine",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=60",
+    "imageUrl": "https://cctv.trafficwatchni.com/3276.jpg"
+  },
+  {
+    "name": "Kilowen St Coleraine",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=67",
+    "imageUrl": "https://cctv.trafficwatchni.com/3283.jpg"
+  },
+  {
+    "name": "Scullions Rd",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=37",
+    "imageUrl": "https://cctv.trafficwatchni.com/3253.jpg"
+  },
+  {
+    "name": "A6 Randalstown",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=39",
+    "imageUrl": "https://cctv.trafficwatchni.com/3255.jpg"
+  },
+  {
+    "name": "A2 Beeches Road",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=30",
+    "imageUrl": "https://cctv.trafficwatchni.com/3246.jpg"
+  },
+  {
+    "name": "A2 Station Road",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=31",
+    "imageUrl": "https://cctv.trafficwatchni.com/3247.jpg"
+  },
+  {
+    "name": "Buncrana Road",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=70",
+    "imageUrl": "https://cctv.trafficwatchni.com/3286.jpg"
+  },
+  {
+    "name": "Caw Roundabout",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=71",
+    "imageUrl": "https://cctv.trafficwatchni.com/3287.jpg"
+  },
+  {
+    "name": "Ballykelly",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=68",
+    "imageUrl": "https://cctv.trafficwatchni.com/3284.jpg"
+  },
+  {
+    "name": "Strand Road",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=79",
+    "imageUrl": "https://cctv.trafficwatchni.com/3295.jpg"
+  },
+  {
+    "name": "Craigavon Bridge",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=72",
+    "imageUrl": "https://cctv.trafficwatchni.com/3288.jpg"
+  },
+  {
+    "name": "A37 Coleraine Mountain",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=23",
+    "imageUrl": "https://cctv.trafficwatchni.com/3239-1.jpg"
+  },
+  {
+    "name": "Greenhaw",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=77",
+    "imageUrl": "https://cctv.trafficwatchni.com/3293.jpg"
+  },
+  {
+    "name": "Great James Street",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=76",
+    "imageUrl": "https://cctv.trafficwatchni.com/3292.jpg"
+  },
+  {
+    "name": "Foyle Bridge",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=20",
+    "imageUrl": "https://cctv.trafficwatchni.com/832-1.jpg"
+  },
+  {
+    "name": "Belt Road",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=69",
+    "imageUrl": "https://cctv.trafficwatchni.com/3285.jpg"
+  },
+  {
+    "name": "A6 Glenshane Pass",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=22",
+    "imageUrl": "https://cctv.trafficwatchni.com/821-1.jpg"
+  },
+  {
+    "name": "Rossdowney Road",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=78",
+    "imageUrl": "https://cctv.trafficwatchni.com/3294.jpg"
+  },
+  {
+    "name": "Dales Corner/A6 Glendermott Rd - A2 ColumbraTerrace",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=74",
+    "imageUrl": "https://cctv.trafficwatchni.com/3290.jpg"
+  },
+  {
+    "name": "Culmore Roundabout",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=73",
+    "imageUrl": "https://cctv.trafficwatchni.com/3289.jpg"
+  },
+  {
+    "name": "Saintfield Road - Primrose Hill",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=43",
+    "imageUrl": "https://cctv.trafficwatchni.com/3259.jpg"
+  },
+  {
+    "name": "A2 Rathgael, Bangor",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=14",
+    "imageUrl": "https://cctv.trafficwatchni.com/0.jpg"
+  },
+  {
+    "name": "Saintfield Rd Roundabout Lisburn",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=34",
+    "imageUrl": "https://cctv.trafficwatchni.com/3250.jpg"
+  },
+  {
+    "name": "A2 - Bangor Rd - Old Station Rd",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=46",
+    "imageUrl": "https://cctv.trafficwatchni.com/3262.jpg"
+  },
+  {
+    "name": "Prince William Rd - Lisburn North Feeder Rd",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=32",
+    "imageUrl": "https://cctv.trafficwatchni.com/3248.jpg"
+  },
+  {
+    "name": "A1 - B10 Overbridge Junction",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=58",
+    "imageUrl": "https://cctv.trafficwatchni.com/3274.jpg"
+  },
+  {
+    "name": "A3 Moira Road - Halftown Road",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=168",
+    "imageUrl": "https://cctv.trafficwatchni.com/66.jpg"
+  },
+  {
+    "name": "A1 Banbridge",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=15",
+    "imageUrl": "https://cctv.trafficwatchni.com/2.jpg"
+  },
+  {
+    "name": "A1 - Hillsborough Road Roundabout",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=57",
+    "imageUrl": "https://cctv.trafficwatchni.com/3273.jpg"
+  },
+  {
+    "name": "A28 Markethill",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=21",
+    "imageUrl": "https://cctv.trafficwatchni.com/823-1.jpg"
+  },
+  {
+    "name": "A2 - Ballyrobert",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=47",
+    "imageUrl": "https://cctv.trafficwatchni.com/3263.jpg"
+  },
+  {
+    "name": "M1 - Blaris - Jct 8",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=35",
+    "imageUrl": "https://cctv.trafficwatchni.com/3251.jpg"
+  },
+  {
+    "name": "Belsize Rd - North Feeder Rd",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=166",
+    "imageUrl": "https://cctv.trafficwatchni.com/61.jpg"
+  },
+  {
+    "name": "A1 Newry",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=18",
+    "imageUrl": "https://cctv.trafficwatchni.com/1.jpg"
+  },
+  {
+    "name": "A1 - Cloghoge - Newry",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=59",
+    "imageUrl": "https://cctv.trafficwatchni.com/3275.jpg"
+  },
+  {
+    "name": "A1 - Blaris",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=56",
+    "imageUrl": "https://cctv.trafficwatchni.com/3272.jpg"
+  },
+  {
+    "name": "A24 Carryduff",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=19",
+    "imageUrl": "https://cctv.trafficwatchni.com/2239-1.jpg"
+  },
+  {
+    "name": "M1 Tamnamore",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=13",
+    "imageUrl": "https://cctv.trafficwatchni.com/17.jpg"
+  },
+  {
+    "name": "Dromore Road at Asda, Omagh",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=195",
+    "imageUrl": "https://cctv.trafficwatchni.com/782.jpg"
+  },
+  {
+    "name": "Orritor Street/William Street, Cookstown",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=199",
+    "imageUrl": "https://cctv.trafficwatchni.com/786.jpg"
+  },
+  {
+    "name": "Great Northern Road, Tamlaght Road (Homebase), Omagh",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=196",
+    "imageUrl": "https://cctv.trafficwatchni.com/783.jpg"
+  },
+  {
+    "name": "Dublin Road at Great Northern Road, Omagh",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=194",
+    "imageUrl": "https://cctv.trafficwatchni.com/781.jpg"
+  },
+  {
+    "name": "Gortmerron Link Road, Dungannon",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=197",
+    "imageUrl": "https://cctv.trafficwatchni.com/784.jpg"
+  },
+  {
+    "name": "Market Square, Dungannon",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=198",
+    "imageUrl": "https://cctv.trafficwatchni.com/785.jpg"
+  },
+  {
+    "name": "Gaol Square, Enniskillen",
+    "viewerUrl": "https://trafficwatchni.com/twni/cameras/static?id=200",
+    "imageUrl": "https://cctv.trafficwatchni.com/787.jpg"
+  }
+]
