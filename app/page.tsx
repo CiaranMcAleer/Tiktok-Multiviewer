@@ -861,27 +861,19 @@ function MultiviewerApp() {
                   </DialogHeader>
                   <div className="mt-4 space-y-4">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Columns</label>
-                      <Select
-                        value={gridColumns.toString()}
-                        onValueChange={(value) => setGridColumns(Number.parseInt(value))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select columns" />
-                        </SelectTrigger>
-                        <SelectContent className="z-[10000]">
-                          <SelectItem value="1">1 Column</SelectItem>
-                          <SelectItem value="2">2 Columns</SelectItem>
-                          <SelectItem value="3">3 Columns</SelectItem>
-                          <SelectItem value="4">4 Columns</SelectItem>
-                          <SelectItem value="5">5 Columns</SelectItem>
-                          <SelectItem value="6">6 Columns</SelectItem>
-                          <SelectItem value="7">7 Columns</SelectItem>
-                          <SelectItem value="8">8 Columns</SelectItem>
-                          <SelectItem value="9">9 Columns</SelectItem>
-                          <SelectItem value="10">10 Columns</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <label className="text-sm font-medium" htmlFor="grid-columns-input">Columns</label>
+                      <Input
+                        id="grid-columns-input"
+                        type="number"
+                        min={1}
+                        max={10}
+                        value={gridColumns}
+                        onChange={e => {
+                          const val = Math.max(1, Math.min(10, Number(e.target.value)));
+                          setGridColumns(val);
+                        }}
+                        className="w-24"
+                      />
                     </div>
                     <Button onClick={updateGridSettings} className="w-full">
                       Apply Grid Settings
@@ -1118,7 +1110,7 @@ function MultiviewerApp() {
             </div>
           </div>
         ) : (
-          <div className={`grid gap-4 grid-cols-${gridColumns}`}>
+          <div className={`grid gap-4 grid-cols-${Math.max(1, Math.min(12, gridColumns))}`}> 
             {widgets.map((widget, index) => (
               <div
                 key={widget.id}
