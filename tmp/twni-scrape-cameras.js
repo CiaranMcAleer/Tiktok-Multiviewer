@@ -14,8 +14,20 @@ async function extractCameraName(viewerUrl) {
   try {
     const res = await axios.get(viewerUrl);
     const $ = cheerio.load(res.data);
-    // Try to get camera name from heading tags or strong tags
-    let name = $('h1, h2, h3, strong, .camera-title').first().text().trim();
+    // Try to get camera name from header tag with specific class
+    let name = $('.container-fluid #cctvSelection header.h4.pb-1.text-nowrap.text-truncate').first().text().trim();
+    if (!name) {
+      // fallback: header inside #cctvSelection
+      name = $('#cctvSelection header.h4.pb-1.text-nowrap.text-truncate').first().text().trim();
+    }
+    if (!name) {
+      // fallback: header.h4
+      name = $('header.h4').first().text().trim();
+    }
+    if (!name) {
+      // fallback: header
+      name = $('header').first().text().trim();
+    }
     if (!name) {
       // fallback: alt text of main image
       name = $('img[alt]').first().attr('alt') || '';
