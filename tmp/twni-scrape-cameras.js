@@ -7,7 +7,7 @@ const path = require('path');
 
 const BASE_URL = 'https://trafficwatchni.com';
 const CAMERAS_URL = `${BASE_URL}/twni/cameras?viewby=region`;
-const OUTPUT_PATH = path.join(__dirname, 'public', 'twni-cameras.json');
+const OUTPUT_PATH = path.join(__dirname, '..', 'public', 'twni-cameras.json');
 
 // Extract camera name from viewer page (for validation)
 async function extractCameraName(viewerUrl) {
@@ -120,7 +120,12 @@ async function main() {
   }
   const deduped = Array.from(seen.values());
   for (let cam of deduped) {
-    cam.imageUrl = await extractImageUrl(cam.viewerUrl);
+    let imgUrl = await extractImageUrl(cam.viewerUrl);
+    // Remove ?cache=<num> from imageUrl if present
+    if (imgUrl) {
+      imgUrl = imgUrl.replace(/\?cache=\d+$/, '');
+    }
+    cam.imageUrl = imgUrl;
     // Validate name from viewer page
     const validated = await extractCameraName(cam.viewerUrl);
     cam.validatedName = validated || cam.name;
