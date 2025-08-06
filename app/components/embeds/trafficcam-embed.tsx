@@ -21,19 +21,8 @@ export const TrafficCamEmbed = ({ widget, lastRefresh, onError }: TrafficCamEmbe
           const urlIdMatch = widget.url.match(/id=(\d+)/)
           const urlCameraId = urlIdMatch ? urlIdMatch[1] : null
           
-          // Try to match by camera ID first, then by viewerUrl or name
-          const cam = data.find(
-            (c: any) => {
-              if (urlCameraId) {
-                const camIdMatch = c.viewerUrl.match(/id=(\d+)/)
-                const camId = camIdMatch ? camIdMatch[1] : null
-                if (camId === urlCameraId) return true
-              }
-              return c.viewerUrl === widget.url ||
-                     c.name === widget.title ||
-                     (widget.url && widget.url.includes(c.viewerUrl))
-            }
-          );
+          // Always match by viewerUrl for accuracy
+          const cam = data.find((c: any) => c.viewerUrl === widget.url);
           if (cam) {
             setTrafficImageUrl(cam.imageUrl);
             setCameraTitle(cam.name);
