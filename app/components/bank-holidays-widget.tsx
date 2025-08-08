@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { CalendarDays, RefreshCw } from "lucide-react"
+import { CalendarDays, RefreshCw, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface BankHoliday {
@@ -58,11 +58,22 @@ export default function BankHolidaysWidget({ onRemove, theme }: { onRemove?: () 
           <CalendarDays className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           <span className="font-semibold text-base">Upcoming UK Bank Holidays</span>
         </div>
-        {onRemove && (
-          <Button variant="ghost" size="icon" onClick={onRemove}>
-            <RefreshCw className="h-5 w-5" />
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" onClick={fetchHolidays} aria-label="Refresh">
+            <RefreshCw className="h-4 w-4" />
           </Button>
-        )}
+          {onRemove && (
+            <Button
+              variant="ghost"
+              size="icon"
+              
+              onClick={onRemove}
+              aria-label="Remove widget"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
       <div className="flex-1 flex flex-col justify-center">
         {loading ? (
