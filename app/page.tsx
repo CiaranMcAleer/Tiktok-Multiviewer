@@ -71,6 +71,39 @@ function MultiviewerApp() {
     ])
     setIsTwniDialogOpen(false)
   }
+
+  // Add all available TrafficWatchNI cameras (respects max widgets)
+  const handleAddAllTwniCameras = (
+    cameras: { name: string; viewerUrl: string; imageUrl: string }[],
+    refreshInterval: number
+  ) => {
+    const MAX_WIDGETS = 150
+    const remaining = MAX_WIDGETS - widgets.length
+    if (remaining <= 0) {
+      alert(`Maximum ${MAX_WIDGETS} widgets allowed`)
+      return
+    }
+    const toAdd = cameras.slice(0, remaining)
+    const now = Date.now()
+    const newWidgets: Widget[] = toAdd.map((cam, i) => {
+      const idMatch = cam.viewerUrl.match(/id=(\d+)/)
+      const cameraId = idMatch ? parseInt(idMatch[1], 10) : undefined
+      return {
+        id: (now + i).toString(),
+        type: "trafficcam",
+        url: cam.viewerUrl,
+        title: cam.name,
+        refreshInterval: refreshInterval * 1000,
+        cameraId,
+        cameraRegion: undefined,
+      }
+    })
+    setWidgets(prev => [...prev, ...newWidgets])
+    if (cameras.length > toAdd.length) {
+      alert(`${toAdd.length} cameras added, ${cameras.length - toAdd.length} skipped due to max ${MAX_WIDGETS}.`)
+    }
+    setIsTwniDialogOpen(false)
+  }
   const [widgets, setWidgets] = useState<Widget[]>([])
   const [inputUrl, setInputUrl] = useState("")
   const [inputTitle, setInputTitle] = useState("")
@@ -1212,6 +1245,7 @@ function MultiviewerApp() {
             <TwniCameraSelector
               onSelect={handleAddTwniCamera}
               onClose={() => setIsTwniDialogOpen(false)}
+              onAddAll={handleAddAllTwniCameras}
             />
           </div>
         </DialogContent>

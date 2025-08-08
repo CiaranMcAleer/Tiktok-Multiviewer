@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react"
 import { useTheme } from "./theme-provider"
+import { Button } from "@/components/ui/button"
 
 
 interface Camera {
@@ -11,9 +12,10 @@ interface Camera {
 interface Props {
   onSelect: (camera: Camera, refreshInterval: number) => void
   onClose: () => void
+  onAddAll?: (cameras: Camera[], refreshInterval: number) => void
 }
 
-export default function TwniCameraSelector({ onSelect, onClose }: Props) {
+export default function TwniCameraSelector({ onSelect, onClose, onAddAll }: Props) {
   const { theme } = useTheme()
   const [search, setSearch] = useState("")
   const [refresh, setRefresh] = useState(5)
@@ -94,6 +96,11 @@ export default function TwniCameraSelector({ onSelect, onClose }: Props) {
           <span className="text-xs w-16 text-right">{refresh === 2 ? "Real-time (2s)" : `${refresh}s`}</span>
         </div>
       </div>
+      {onAddAll && (
+        <Button className="w-full" onClick={() => onAddAll(cameras, refresh)}>
+          Add All ({cameras.length})
+        </Button>
+      )}
       <div className={`max-h-64 overflow-y-auto border rounded transition-colors duration-200 ${bgList}`}>
         {loading ? (
           <div className={`p-4 ${textMuted}`}>Loading cameras...</div>
