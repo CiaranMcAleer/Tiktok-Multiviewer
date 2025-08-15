@@ -16,7 +16,7 @@ Next.js-based multiviewer grid webapp for TikTok Live. Modular and extendable to
 
 ![image](https://github.com/user-attachments/assets/47f504b1-6724-4d8b-93fa-cbd735c89919)
 
-> **Note:** Due to platform limitations, TikTok Live links must be opened in a popup window.
+> **Note:** Due to platform limitations, TikTok Live links will be opened in a popup window.
 
 ![image](https://github.com/user-attachments/assets/1fe3a478-57b6-49b9-9310-8b190cd25697)
 
@@ -41,7 +41,7 @@ Next.js-based multiviewer grid webapp for TikTok Live. Modular and extendable to
 
 ### Input Examples
 - `https://www.tiktok.com/@user` → TikTok widget
-- `tw:ninja` → Twitch channel widget  
+- `tw:ninja` → Twitch channel widget 
 - `yt:mkbhd` → YouTube channel widget
 - `@charlidamelio` → TikTok widget
 - `ninja` → Shows disambiguation dialog
