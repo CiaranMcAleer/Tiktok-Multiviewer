@@ -29,7 +29,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubTrigger, DropdownMenuSubContent } from "@/components/ui/dropdown-menu"
+import { menuItems } from "./config/menuItems"
+import type { MenuItem, WidgetMenuItem, FolderMenuItem } from "./types/menu"
 import StreamWidget from "./components/stream-widget"
 import VideoStreamWidget from "./components/video-stream-widget"
 import TwniCameraSelector from "./components/twni-camera-selector"
@@ -48,6 +50,73 @@ import type { Widget, LayoutData, WidgetType } from "./types/widget"
 import PopupManager from "./utils/popup-manager"
 
 function MultiviewerApp() {
+  // Recursive menu rendering for folders/groups
+  function renderMenuItems(items: MenuItem[]): React.ReactNode {
+    return items.map((item, idx) => {
+      const Icon = item.icon;
+      if (item.type === "folder") {
+        return (
+          <DropdownMenuSub key={item.label + idx}>
+            <DropdownMenuSubTrigger>
+              {Icon && <Icon className="mr-2 h-4 w-4" />}
+              {item.label}
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent>
+              {renderMenuItems(item.children)}
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+        );
+      } else {
+        // Widget menu item
+        // Handle special dialogs for website, notes, RSS, weather, trafficcam
+        if (item.widgetType === "website") {
+          return (
+            <DropdownMenuItem key={item.label + idx} onClick={() => setIsWebsiteDialogOpen(true)}>
+              {Icon && <Icon className="mr-2 h-4 w-4" />}
+              {item.label}
+            </DropdownMenuItem>
+          );
+        } else if (item.widgetType === "notes") {
+          return (
+            <DropdownMenuItem key={item.label + idx} onClick={() => setIsNotesDialogOpen(true)}>
+              {Icon && <Icon className="mr-2 h-4 w-4" />}
+              {item.label}
+            </DropdownMenuItem>
+          );
+        } else if (item.widgetType === "rss") {
+          return (
+            <DropdownMenuItem key={item.label + idx} onClick={() => setIsRSSDialogOpen(true)}>
+              {Icon && <Icon className="mr-2 h-4 w-4" />}
+              {item.label}
+            </DropdownMenuItem>
+          );
+        } else if (item.widgetType === "weather") {
+          return (
+            <DropdownMenuItem key={item.label + idx} onClick={() => setIsWeatherDialogOpen(true)}>
+              {Icon && <Icon className="mr-2 h-4 w-4" />}
+              {item.label}
+            </DropdownMenuItem>
+          );
+        } else if (item.widgetType === "trafficcam") {
+          return (
+            <DropdownMenuItem key={item.label + idx} onClick={() => setIsTwniDialogOpen(true)}>
+              {Icon && <Icon className="mr-2 h-4 w-4" />}
+              {item.label}
+            </DropdownMenuItem>
+          );
+        } else {
+          // All other widget types use addWidget
+          return (
+            <DropdownMenuItem key={item.label + idx} onClick={() => addWidget(item.widgetType).catch(console.error)}>
+              {Icon && <Icon className="mr-2 h-4 w-4" />}
+              {item.label}
+            </DropdownMenuItem>
+          );
+        }
+      }
+    });
+  }
+
   // Handler for adding a TWNI camera from the selector overlay
   const handleAddTwniCamera = (
     camera: { name: string; viewerUrl: string; imageUrl: string },
@@ -746,36 +815,10 @@ function MultiviewerApp() {
                     <Plus className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => addWidget("worldtime").catch(console.error)}> 
-                    <Clock className="h-4 w-4 mr-2" />
-                    World Time
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setIsWebsiteDialogOpen(true)}>
-                    <Globe className="h-4 w-4 mr-2" />
-                    Website Embed
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setIsNotesDialogOpen(true)}>
-                    <FileText className="h-4 w-4 mr-2" />
-                    Notes
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setIsRSSDialogOpen(true)}>
-                    <Rss className="h-4 w-4 mr-2" />
-                    RSS Feed
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setIsWeatherDialogOpen(true)}>
-                    <CloudSun className="h-4 w-4 mr-2" />
-                    Weather
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setIsTwniDialogOpen(true)}>
-                    <Camera className="h-4 w-4 mr-2" />
-                    TrafficWatchNI Camera
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => addWidget("bankholidays").catch(console.error)}> 
-                    <CalendarDays className="h-4 w-4 mr-2" />
-                    UK Bank Holidays
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
+                 <DropdownMenuContent align="end">
+                   {/* Recursive menu rendering for folders/groups */}
+                   {renderMenuItems(menuItems)}
+                 </DropdownMenuContent>
               </DropdownMenu>
               <Button variant="ghost" size="icon" onClick={toggleTheme} className="rounded-full">
                 {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
