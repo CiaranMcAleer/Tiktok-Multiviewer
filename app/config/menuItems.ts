@@ -1,4 +1,4 @@
-import { AppWindow, Map, Globe2, Clock, StickyNote, Rss, CloudSun, CalendarDays, Folder } from "lucide-react";
+import { AppWindow, Map, Globe2, Clock, StickyNote, Rss, CloudSun, CalendarDays, Folder, Camera } from "lucide-react";
 import type { MenuItem } from "../types/menu";
 
 /**
@@ -32,6 +32,13 @@ import type { MenuItem } from "../types/menu";
  */
 
 export const menuItems: MenuItem[] = [
+  {
+    label: "Traffic Camera",
+    type: "widget",
+    widgetType: "trafficcam",
+    icon: Camera,
+    description: "Live NI traffic cameras"
+  },
   {
     label: "Website Embed",
     type: "widget",
