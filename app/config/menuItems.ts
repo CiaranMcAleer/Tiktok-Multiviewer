@@ -33,7 +33,7 @@ import type { MenuItem } from "../types/menu";
 
 export const menuItems: MenuItem[] = [
   {
-    label: "Traffic Camera",
+    label: "NI Traffic Cameras",
     type: "widget",
     widgetType: "trafficcam",
     icon: Camera,
