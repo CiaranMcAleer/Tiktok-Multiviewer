@@ -274,8 +274,8 @@ function MultiviewerApp() {
   }
 
   const addWidget = async (forceType?: WidgetType, overrideUrl?: string, overrideTitle?: string) => {
-    if (widgets.length >= 30) {
-      alert("Maximum 30 widgets allowed")
+    if (widgets.length >= 150) {
+      alert("Maximum 150 widgets allowed")
       return
     }
 
