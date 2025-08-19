@@ -33,11 +33,26 @@ import type { MenuItem } from "../types/menu";
 
 export const menuItems: MenuItem[] = [
   {
-    label: "NI Traffic Cameras",
-    type: "widget",
-    widgetType: "trafficcam",
+    label: "Traffic Cameras",
+    type: "folder",
     icon: Camera,
-    description: "Live NI traffic cameras"
+    children: [
+      {
+        label: "NI Traffic Cameras",
+        type: "widget",
+        widgetType: "trafficcam",
+        icon: Camera,
+        description: "Live NI traffic cameras"
+      },
+      {
+        label: "Letterkenny Traffic Camera",
+        type: "widget",
+        widgetType: "website",
+        icon: Camera,
+        description: "Live Letterkenny traffic camera (official player)",
+        defaultUrl: "https://g0.ipcamlive.com/player/player.php?alias=6564abbb57b78&autoplay=1&disableautofullscreen=1&disablefullscreen=1"
+      }
+    ]
   },
   {
     label: "Website Embed",

@@ -68,51 +68,33 @@ function MultiviewerApp() {
         );
       } else {
         // Widget menu item
-        // Handle special dialogs for website, notes, RSS, weather, trafficcam
         if (item.widgetType === "website") {
           return (
-            <DropdownMenuItem key={item.label + idx} onClick={() => setIsWebsiteDialogOpen(true)}>
-              {Icon && <Icon className="mr-2 h-4 w-4" />}
-              {item.label}
-            </DropdownMenuItem>
-          );
-        } else if (item.widgetType === "notes") {
-          return (
-            <DropdownMenuItem key={item.label + idx} onClick={() => setIsNotesDialogOpen(true)}>
-              {Icon && <Icon className="mr-2 h-4 w-4" />}
-              {item.label}
-            </DropdownMenuItem>
-          );
-        } else if (item.widgetType === "rss") {
-          return (
-            <DropdownMenuItem key={item.label + idx} onClick={() => setIsRSSDialogOpen(true)}>
-              {Icon && <Icon className="mr-2 h-4 w-4" />}
-              {item.label}
-            </DropdownMenuItem>
-          );
-        } else if (item.widgetType === "weather") {
-          return (
-            <DropdownMenuItem key={item.label + idx} onClick={() => setIsWeatherDialogOpen(true)}>
-              {Icon && <Icon className="mr-2 h-4 w-4" />}
-              {item.label}
-            </DropdownMenuItem>
-          );
-        } else if (item.widgetType === "trafficcam") {
-          return (
-            <DropdownMenuItem key={item.label + idx} onClick={() => setIsTwniDialogOpen(true)}>
-              {Icon && <Icon className="mr-2 h-4 w-4" />}
-              {item.label}
-            </DropdownMenuItem>
-          );
-        } else {
-          // All other widget types use addWidget
-          return (
-            <DropdownMenuItem key={item.label + idx} onClick={() => addWidget(item.widgetType).catch(console.error)}>
+            <DropdownMenuItem
+              key={item.label + idx}
+              onClick={() => {
+                if (item.defaultUrl) {
+                  addWidget("website", item.defaultUrl, item.label).catch(console.error);
+                } else {
+                  setIsWebsiteDialogOpen(true);
+                }
+              }}>
               {Icon && <Icon className="mr-2 h-4 w-4" />}
               {item.label}
             </DropdownMenuItem>
           );
         }
+        // Default block for all other widget types
+        return (
+          <DropdownMenuItem
+            key={item.label + idx}
+            onClick={() => {
+              addWidget(item.widgetType).catch(console.error);
+            }}>
+            {Icon && <Icon className="mr-2 h-4 w-4" />}
+            {item.label}
+          </DropdownMenuItem>
+        );
       }
     });
   }
@@ -291,14 +273,14 @@ function MultiviewerApp() {
     return null
   }
 
-  const addWidget = async (forceType?: WidgetType) => {
+  const addWidget = async (forceType?: WidgetType, overrideUrl?: string, overrideTitle?: string) => {
     if (widgets.length >= 30) {
       alert("Maximum 30 widgets allowed")
       return
     }
 
-    let url = inputUrl.trim()
-    let title = inputTitle.trim()
+    let url = overrideUrl !== undefined ? overrideUrl : inputUrl.trim()
+    let title = overrideTitle !== undefined ? overrideTitle : inputTitle.trim()
     let type: WidgetType = forceType || "trafficcam" // Default to traffic cam if no URL and no forced type
     let streamType: "hls" | "dash" | "mp4" | undefined = undefined
     let cameraId: number | undefined = undefined

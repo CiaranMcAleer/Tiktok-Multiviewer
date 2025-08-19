@@ -4,6 +4,7 @@ export type WidgetMenuItem = {
   widgetType: import("./widget").WidgetType;
   icon?: React.ElementType;
   description?: string;
+  defaultUrl?: string; // For stream widgets, allows specifying a default stream URL
 };
 
 export type FolderMenuItem = {
