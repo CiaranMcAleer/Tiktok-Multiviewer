@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useWidgetVisibility } from "../hooks/use-widget-visibility"
 import { X, RefreshCw, ExternalLink, Maximize2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -19,6 +20,7 @@ interface StreamWidgetProps {
 }
 
 export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetProps) {
+  const [widgetRef, isVisible] = useWidgetVisibility({ threshold: 0.5 })
   const [embedError, setEmbedError] = useState(false)
   
   const { isActive, openPopupWindow, closePopup } = usePopupManager(widget)
@@ -33,7 +35,7 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
     }
   }
   
-  const { lastRefresh, refreshContent } = useAutoRefresh(widget, handleRefreshCallback)
+  const { lastRefresh, refreshContent } = useAutoRefresh(widget, handleRefreshCallback, isVisible)
 
   const handleError = () => setEmbedError(true)
 
@@ -88,6 +90,7 @@ export default function StreamWidget({ widget, onRemove, theme }: StreamWidgetPr
 
   return (
     <Card
+      ref={widgetRef}
       className={`relative h-96 ${isActive ? "ring-2 ring-green-500" : ""} bg-background border-border`}
     >
       <CardHeader className="flex flex-row items-center justify-between p-3">

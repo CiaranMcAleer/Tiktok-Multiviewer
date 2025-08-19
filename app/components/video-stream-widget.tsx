@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { useWidgetVisibility } from "../hooks/use-widget-visibility"
 import { X, RefreshCw, ExternalLink, Maximize2, Play } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -26,6 +27,7 @@ interface VideoStreamWidgetProps {
 }
 
 export default function VideoStreamWidget({ widget, onRemove }: VideoStreamWidgetProps) {
+  const [widgetRef, isVisible] = useWidgetVisibility({ threshold: 0.5 })
   const videoRef = useRef<HTMLDivElement>(null)
   const nativeVideoRef = useRef<HTMLVideoElement>(null)
   const playerRef = useRef<any>(null)
@@ -234,7 +236,7 @@ export default function VideoStreamWidget({ widget, onRemove }: VideoStreamWidge
 
   if (hasError) {
     return (
-      <Card className="relative h-96 bg-background border border-border">
+    <Card ref={widgetRef} className="relative h-96 bg-background border border-border">
         <CardHeader className="flex flex-row items-center justify-between p-3">
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-2 h-2 rounded-full bg-red-500" />
