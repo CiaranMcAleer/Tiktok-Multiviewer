@@ -97,8 +97,8 @@ export default function TwniCameraSelector({ onSelect, onClose, onAddAll }: Prop
         </div>
       </div>
       {onAddAll && (
-        <Button className="w-full" onClick={() => onAddAll(cameras, refresh)}>
-          Add All ({cameras.length})
+        <Button className="w-full" onClick={() => onAddAll(filtered, refresh)}>
+          {search ? "Add Selection" : "Add All"} ({filtered.length})
         </Button>
       )}
       <div className={`max-h-64 overflow-y-auto border rounded transition-colors duration-200 ${bgList}`}>
