@@ -83,6 +83,39 @@ function MultiviewerApp() {
               {item.label}
             </DropdownMenuItem>
           );
+        } else if (item.widgetType === "rss") {
+          return (
+            <DropdownMenuItem
+              key={item.label + idx}
+              onClick={() => {
+                setIsRSSDialogOpen(true);
+              }}>
+              {Icon && <Icon className="mr-2 h-4 w-4" />}
+              {item.label}
+            </DropdownMenuItem>
+          );
+        } else if (item.widgetType === "notes") {
+          return (
+            <DropdownMenuItem
+              key={item.label + idx}
+              onClick={() => {
+                setIsNotesDialogOpen(true);
+              }}>
+              {Icon && <Icon className="mr-2 h-4 w-4" />}
+              {item.label}
+            </DropdownMenuItem>
+          );
+        } else if (item.widgetType === "weather") {
+          return (
+            <DropdownMenuItem
+              key={item.label + idx}
+              onClick={() => {
+                setIsWeatherDialogOpen(true);
+              }}>
+              {Icon && <Icon className="mr-2 h-4 w-4" />}
+              {item.label}
+            </DropdownMenuItem>
+          );
         }
         // Default block for all other widget types
         return (
