@@ -9,7 +9,7 @@ import ANNOUNCEMENT_MESSAGES from './components/announcement-message';
 
 
 export const metadata: Metadata = {
-  title: 'TikTok Multiviewer',
+  title: 'Quanta',
   description: 'A multi-source livestream and widget dashboard for TikTok, YouTube, Twitch, and more. Developed by Ciaran McAleer.',
   generator: 'Ciaran McAleer',
 };

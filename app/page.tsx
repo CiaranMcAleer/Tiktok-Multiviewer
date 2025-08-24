@@ -789,7 +789,15 @@ function MultiviewerApp() {
       >
         <div className="container mx-auto px-4 py-4 w-full max-w-full">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <h1 className="text-2xl font-bold mb-2 md:mb-0">Multiviewer</h1>
+            <h1
+              className="text-4xl font-bold mb-2 md:mb-0"
+              style={{
+                fontFamily: "'Press Start 2P', monospace",
+                fontWeight: 400
+              }}
+            >
+              Quanta
+            </h1>
             <div className="flex flex-row flex-wrap gap-2 items-center">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
