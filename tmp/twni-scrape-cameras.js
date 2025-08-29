@@ -63,6 +63,10 @@ async function extractImageUrl(viewerUrl) {
     let img = $('img.cctvImage, img#camera-image, img.camera-image, .camera-image img').attr('src');
     if (!img) img = $('img').first().attr('src');
     if (img && !img.startsWith('http')) img = BASE_URL + img;
+    // Strip cache parameter for client-side freshness
+    if (img && img.includes('?cache=')) {
+      img = img.split('?')[0];
+    }
     return img || null;
   } catch (e) {
     return null;
@@ -121,10 +125,7 @@ async function main() {
   const deduped = Array.from(seen.values());
   for (let cam of deduped) {
     let imgUrl = await extractImageUrl(cam.viewerUrl);
-    // Remove ?cache=<num> from imageUrl if present
-    if (imgUrl) {
-      imgUrl = imgUrl.replace(/\?cache=\d+$/, '');
-    }
+    // Keep cache parameter - it's now required for images to load properly
     cam.imageUrl = imgUrl;
     // Validate name from viewer page
     const validated = await extractCameraName(cam.viewerUrl);
